@@ -4,6 +4,6 @@ subtitle: "Ne devinez pas, mesurez"
 content:
   - "Data Observability (Elementary) : Intégrez l'observabilité directement dans dbt. Elementary permet de détecter les anomalies de volume, de fraîcheur et de schéma avant que l'utilisateur final ne les voie."
   - "Centralisation des Logs (Elastic Stack) : Ne perdez plus de temps à chercher des logs éparpillés. Utilisez Elasticsearch et Kibana pour indexer, visualiser et corréler les traces de vos pipelines en temps réel."
-  - "Métriques de Santé (SLAs/SLOs) : Définissez des indicateurs clairs sur la qualité de votre donnée. Un artisan sait quand son œuvre dévie de la perfection et agit avant la rupture."
+  - "Métriques de Santé (SLAs/SLOs) : Définissez des indicateurs clairs sur la qualité de votre donnée. Un artisan sait quand son oeuvre dévie de la perfection et agit avant la rupture."
   - "Alerting Intelligent : Évitez la fatigue des alertes. Ne notifiez que sur des événements actionnables et critiques. Une alerte qui n'entraîne pas d'action est un bruit polluant."
   - "Lineage & Impact : Visualisez le parcours de la donnée. Comprendre l'impact d'une modification en amont est la base de la maintenance sereine d'un écosystème complexe."
