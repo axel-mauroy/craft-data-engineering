@@ -1,0 +1,8 @@
+[project]
+name = "craft-data-engineering"
+version = "0.1.0"
+description = "A foundational project for Software Craftsmanship in Data Engineering"
+dependencies = [
+    "fpdf2>=2.8.7",
+    "pyyaml>=6.0.3",
+]

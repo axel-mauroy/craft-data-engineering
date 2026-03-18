@@ -1,0 +1,8 @@
+page_number: 5
+title: "Stratégie de Test Data"
+subtitle: "Confiance totale dans la production"
+content:
+  - "Tests Unitaires : Validez la logique de transformation pure (Domain)."
+  - "Tests d'Intégration : Vérifiez les connecteurs avec des ressources éphémères (Testcontainers)."
+  - "Tests de Qualité (GX, dbt-tests) : Vérifiez la distribution et la fraîcheur des données."
+  - "Le code non testé est déjà obsolète."

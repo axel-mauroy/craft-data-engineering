@@ -1,0 +1,9 @@
+page_number: 1
+title: "Mindset du Data Craftsman"
+subtitle: "L'excellence technique au service de la donnée"
+content:
+  - "Professionnalisme & Responsabilité (The Clean Coder) : Un Data Craftsman ne se contente pas de coder ; il prend la responsabilité de la qualité et de la disponibilité de la donnée en production."
+  - "Le Code comme Communication (Clean Code) : Le code de pipeline doit être auto-explicatif. La lisibilité prime sur l'astuce technique ; un code 'propre' réduit drastiquement la dette cognitive de l'équipe."
+  - "Pragmatisme & Valeur Métier (The Software Craftsman) : L'objectif ultime reste la création de valeur. L'excellence technique n'est pas une fin en soi, mais le moyen infaillible d'être agile face au changement."
+  - "Culture de l'Apprentissage (Pete McBreen) : Le craftsmanship est un voyage de l'apprenti vers le maître. Partagez vos patterns, critiquez vos pipelines et élevez le niveau global de l'équipe."
+  - "Production-Ready Mindset (Release It!) : Concevez vos pipelines pour qu'ils échouent gracieusement. La résilience face aux pannes et l'observabilité sont des citoyens de première classe dès le premier commit."

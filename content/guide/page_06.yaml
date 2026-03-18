@@ -1,0 +1,9 @@
+page_number: 6
+title: "Clean Code & Refactoring"
+subtitle: "Le code est écrit pour les humains, les données pour les machines"
+content:
+  - "Principes SOLID : Appliquez les fondamentaux du Clean Code même dans vos scripts de données pour garantir l'indépendance de vos composants."
+  - "Nommage & Intention : Donnez un but clair à chaque variable et chaque pipeline. 'df_cleaned' est une défaite ; décrivez ce qu'est la donnée réellement."
+  - "Linters & Formatters : Utilisez Ruff pour automatiser l'excellence typographique du code. Ne laissez jamais un débat sur les indentations polluer vos revues de code."
+  - "Fonctions pures & Effets de bord : Isolez vos transformations pour les rendre prévisibles, réutilisables et surtout, testables unitairement."
+  - "Refactoring Constantin : Le code est une matière vivante. Si vous trouvez une zone d'ombre ou une fragilité, laissez-la plus propre que vous ne l'avez trouvée."
