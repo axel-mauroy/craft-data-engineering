@@ -11,7 +11,7 @@ content:
   - "**Culture de la Transmission :** Le craftsmanship est un compagnonnage. Partagez vos patterns et pratiquez la revue de code constructive."
   - "**Production-Ready by Design :** Anticipez l'échec. La résilience, l'observabilité et le monitoring sont intégrés dès le premier commit."
   - "**Craftsman Tip :** Transformez l'obscur en évidence. Remplacez les structures de données génériques via le typage fort (ex: [transaction_processor.py](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/transaction_processor.py))."
-  - "**Outillage Moderne :** Privilégiez un outillage moderne et maintenez une documentation vivante pour supprimer toute friction d'onboarding."
+  - "**Outillage Moderne :** Privilégiez un outillage moderne et maintenez une [documentation vivante](https://www.sfeir.dev/documentation-as-code-definition/) pour supprimer toute friction d'onboarding."
 references:
   - "Robert C. Martin (The Clean Coder)"
   - "Robert C. Martin (Clean Code)"
