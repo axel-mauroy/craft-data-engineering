@@ -6,7 +6,6 @@ content:
   - "**Data Mesh :** C'est l'application du DDD à l'analytique. L'objectif est de décentraliser la propriété de la donnée vers les domaines métiers (Ex: 'Supply Chain', 'Ventes') plutôt que d'avoir un goulot d'étranglement centralisé."
   - "**Bounded Contexts (Mapping) :** Traduisez le DDD en objets physiques. Le domaine 'Ventes' écrit dans `prdSalesDomain`, isolé du domaine 'Logistics'."
   - "**Ubiquitous Language :** Le vocabulaire métier dicte le nom des champs. Si le métier parle de 'Date de Commande', on modélise `dateCommande`, documenté dans Collibra et synchronisé avec dbt (via meta)."
-  - "**Data Contracts (dbt >= 1.10) :** Les modèles d'interface (Ventes vers Compta) doivent avoir des contrats stricts (typage fort, nullité, sémantique). [Exemple data_contract.yml](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/data_contract.yml). Elementary teste ces contrats en continu pour garantir qu'aucune anomalie ne casse les flux."
   - "**Architecture dbt Mesh :** Utilisez dependencies.yml pour des dépôts Git séparés (Multi-projets) ou un Monorepo partitionné par dossiers métiers (ex: `models/sales/`, `models/supplyChain/`)."
   - "**Modélisation SQL d'Expert :** Exploitez le partitionnement et le clustering natifs BigQuery. [Voir fctFacture.sql](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/fctFacture.sql) & [Isolation du Domaine (domain.sql)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/domain.sql)."
 references:

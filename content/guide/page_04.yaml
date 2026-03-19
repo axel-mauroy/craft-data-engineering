@@ -3,6 +3,7 @@ title: "Data Contracts & Typage Fort"
 subtitle: "L'accord formel entre l'ingénierie logicielle et la donnée"
 content:
   - "Définir l'Attente : Un Data Contract est un accord formel décrivant le schéma, la sémantique et la qualité attendue de la donnée, liant les producteurs aux consommateurs."
+  - "**Data Contracts (dbt >= 1.10) :** Les modèles d'interface (Ventes vers Compta) doivent avoir des contrats stricts (typage fort, nullité, sémantique). [Exemple data_contract.yml](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/data_contract.yml). Elementary teste ces contrats en continu pour garantir qu'aucune anomalie ne casse les flux."
   - "Shifting Left : Poussez la responsabilité de la qualité de la donnée à la source. Une donnée invalide ne doit jamais entrer dans le pipeline, elle doit échouer à l'émission ('Fail Fast')."
   - "Validation Multi-langage : Utilisez Pydantic ou Pandera pour matérialiser ces contrats en Python. Pour vos couches SQL, exploitez dbt pour garantir l'intégrité de vos tables finales."
   - "Isolation des Changements : Les contrats empêchent les 'silent failures' causées par des modifications de schémas en amont. C'est l'API de votre base de données."
