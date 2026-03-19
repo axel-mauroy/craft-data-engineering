@@ -1,8 +1,9 @@
 page_number: 5
-title: "Stratégie de Test Data"
-subtitle: "Confiance totale dans la production"
+title: "Stratégie de Test & Qualité"
+subtitle: "La donnée est du code : testez-la"
 content:
-  - "Tests Unitaires : Validez la logique de transformation pure (Domain)."
-  - "Tests d'Intégration : Vérifiez les connecteurs avec des ressources éphémères (Testcontainers)."
-  - "Tests de Qualité (GX, dbt-tests) : Vérifiez la distribution et la fraîcheur des données."
-  - "Le code non testé est déjà obsolète."
+  - "Test-Driven Data (GX) : Définissez vos 'Expectations' (nullité, unicité, distribution) avant même d'écrire la transformation. C'est le contrat vivant de votre donnée."
+  - "Fail-Fast Checkpoints : Intégrez des validations bloquantes dans votre orchestrateur. Si la donnée ne respecte pas le contrat, le pipeline s'arrête immédiatement pour protéger l'aval."
+  - "Data Docs & Transparence : Générez une documentation visuelle et partagée de la santé de vos données (GX Data Docs). La qualité ne doit plus être une boîte noire."
+  - "Tests Unitaires & Testcontainers : Utilisez des ressources éphémères pour valider vos connecteurs et votre logique de transformation pure (Domain) sans polluer la production."
+  - "Profiling & Itération : Utilisez le profiling automatisé pour comprendre vos nouveaux datasets et générer vos premières suites de tests. Raffinez-les ensuite comme du code noble."
