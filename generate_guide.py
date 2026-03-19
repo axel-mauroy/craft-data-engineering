@@ -8,7 +8,7 @@ def generate():
     root = Path(__file__).parent
     content_dir = root / "content" / "guide"
     design_system_path = root / "design-system.yaml"
-    output_path = root / "Software_Craftsmanship_Guide.pdf"
+    output_path = root / "Data_Craftmanship_Guide.pdf"
 
     # 1. Load Design System
     ds = DesignSystem.load(design_system_path)
