@@ -26,8 +26,7 @@ class GuideRenderer(FPDF):
         self.set_y(-15)
         self._apply_type_style(self._ds.footer_style)
         
-        # LinkedIn on the left, Page number on the right
-        self.cell(0, 10, "linkedin.com/in/axel-mauroy-5699509a", link="https://www.linkedin.com/in/axel-mauroy-5699509a")
+        # Page number on the right (adjusted for cover)
         self.set_x(self._ds.margins["left"])
         # Display page number - 1 because page 1 is the cover
         self.cell(0, 10, f"Page {self.page_no() - 1}", align="R")
