@@ -1,0 +1,113 @@
+# ==============================================================================
+# CONTRAT DE DONNÉES dbt (Enforced Contracts)
+# ==============================================================================
+# Ce fichier illustre l'implémentation d'un contrat strict sur un modèle d'interface
+# (ex: Ventes vers Comptabilité) pour garantir le typage et la qualité.
+
+# 1. Modèle SQL Associé (ex: models/marts/compta/int_ventes_compta.sql)
+# ------------------------------------------------------------------------------
+# select
+#     order_id              as id_commande,
+#     customer_id           as id_client,
+#     order_date            as date_commande,
+#     invoice_date          as date_facture,
+#     total_amount_ht       as montant_ht,
+#     total_amount_ttc      as montant_ttc,
+#     currency              as devise,
+#     tax_rate              as taux_tva,
+#     status                as statut_commande
+# from {{ ref('fct_ventes') }}
+
+
+# 2. Configuration du Contrat (models/marts/compta/int_ventes_compta.yml)
+# ------------------------------------------------------------------------------
+
+models:
+  - name: int_ventes_compta
+    description: "Interface normalisée des ventes vers la comptabilité (Data Contract)"
+    config:
+      materialized: table
+      contract:
+        enforced: true   # dbt rejettera tout changement de schéma non déclaré
+    
+    # Intégration d'Elementary pour le monitoring continu
+    tests:
+      - elementary.table_anomalies:
+          table_anomalies: [row_count, freshness]
+
+    columns:
+      - name: id_commande
+        description: "Identifiant unique de la commande"
+        data_type: int
+        constraints:
+          - type: primary_key
+        tests:
+          - not_null
+          - unique
+
+      - name: idClient
+        description: "Lien vers la dimension Client"
+        data_type: int
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+
+      - name: date_commande
+        description: "Date de la commande (date business, fuseau local)"
+        data_type: date
+        constraints:
+          - type: not_null
+        tests:
+          - not_null
+
+      - name: date_facture
+        description: "Date d'émission de la facture (peut être nulle si non facturée)"
+        data_type: date
+        constraints: []
+        tests: []          # autorise les valeurs nulles
+
+      - name: montant_ht
+        description: "Montant hors taxes de la commande, dans la devise de facturation"
+        data_type: numeric(18,2)
+        constraints:
+          - type: check
+            expression: "montant_ht >= 0"
+        tests:
+          - not_null
+
+      - name: montant_ttc
+        description: "Montant toutes taxes comprises, dans la devise de facturation"
+        data_type: numeric(18,2)
+        constraints:
+          - type: check
+            expression: "montant_ttc >= montant_ht"
+        tests:
+          - not_null
+
+      - name: devise
+        description: "Code devise ISO 4217 (ex: EUR, USD)"
+        data_type: string
+        constraints:
+          - type: check
+            expression: "length(devise) = 3"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['EUR','USD','GBP','CHF']
+
+      - name: taux_tva
+        description: "Taux de TVA appliqué à la ligne de commande (en pourcentage)"
+        data_type: numeric(5,2)
+        constraints:
+          - type: check
+            expression: "taux_tva >= 0 and taux_tva <= 100"
+
+      - name: statut_commande
+        description: "Statut de la commande pour la compta"
+        data_type: string
+        constraints: []
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['BROUILLON', 'VALIDEE', 'FACTUREE', 'ANNULEE']
