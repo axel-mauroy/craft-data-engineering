@@ -12,8 +12,6 @@ content:
   - "**Production-Ready by Design :** Anticipez l'échec. La résilience, l'observabilité et le monitoring sont intégrés dès le premier commit."
   - "**Outillage Moderne :** Privilégiez un outillage moderne et maintenez une [documentation vivante](https://www.sfeir.dev/documentation-as-code-definition/) pour supprimer toute friction d'onboarding."
 references:
-  - "Robert C. Martin (The Clean Coder)"
-  - "Robert C. Martin (Clean Code)"
   - "John Ousterhout (A Philosophy of Software Design)"
   - "Michael Nygard (Release It!)"
   - "Pete McBreen (Software Craftsmanship)"

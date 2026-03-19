@@ -8,5 +8,5 @@ content:
   - "Fonctions pures & Effets de bord : Isolez vos transformations pour les rendre prévisibles, réutilisables et surtout, testables unitairement."
   - "Refactoring constant : Le code est une matière vivante. Si vous trouvez une zone d'ombre ou une fragilité, laissez-la plus propre que vous ne l'avez trouvée. Refactoring != Rewrite : à pratiquer avec modération !"
 references:
-  - "Robert C. Martin (SOLID)"
+  - "Robert C. Martin (SOLID, The Clean Coder, Clean Code)"
   - "Astronome (Ruff)"

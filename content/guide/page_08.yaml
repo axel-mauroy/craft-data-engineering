@@ -2,8 +2,7 @@ page_number: 8
 title: "IaC & Sécurité"
 subtitle: "L'industrialisation de l'infrastructure"
 content:
-  - "Infrastructure as Code (Principle) : La console Cloud est en lecture seule. Toute ressource (Bucket, BigQuery, IAM) doit être définie par le code (Terraform, Pulumi) pour garantir la reproductibilité et l'auditabilité."
-  - "Immutable Infrastructure : On ne modifie pas un serveur ou une table manuellement. On déploie une nouvelle version via le code. C'est l'assurance d'un état connu et maîtrisé."
+  - "Infrastructure as Code (Principle) : La console Cloud est en lecture seule. Toute ressource (Bucket, Dataset BigQuery, IAM) doit être définie par le code (Terraform, Pulumi) pour garantir la reproductibilité et l'auditabilité. On ne modifie rien manuellement, on déploie une nouvelle version via le code. C'est l'assurance d'un état connu et maîtrisé."
   - "Secrets Management : Les secrets ne sont jamais en clair, ni dans le code, ni dans les logs. Utilisez des gestionnaires de secrets (GCP Secret Manager, HashiCorp Vault) injectés au runtime."
   - "Least Privilege (IAM) : Appliquez le principe du moindre privilège à chaque service account. Un pipeline ne doit avoir que les permissions strictement nécessaires à son exécution."
-  - "Audit & Observabilité : Chaque changement d'infrastructure laisse une trace dans votre système de versioning (Git). Le 'ClickOps' est la source principale des pannes indébuggables."
+  - "Audit & Observabilité : Chaque changement d'infrastructure laisse une trace dans votre système de versioning (Git). Le 'ClickOps' (clics manuels dans la console) est la source principale des pannes difficiles à tracer."
