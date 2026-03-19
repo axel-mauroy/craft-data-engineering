@@ -2,8 +2,11 @@ page_number: 4
 title: "Data Contracts & Typage Fort"
 subtitle: "L'accord formel entre l'ingénierie logicielle et la donnée"
 content:
-  - "Définir l'Attente (Chad Sanderson) : Un Data Contract est un accord formel décrivant le schéma, la sémantique et la qualité attendue de la donnée, liant les producteurs (Software Engineers) aux consommateurs (Data)."
+  - "Définir l'Attente : Un Data Contract est un accord formel décrivant le schéma, la sémantique et la qualité attendue de la donnée, liant les producteurs aux consommateurs."
   - "Shifting Left : Poussez la responsabilité de la qualité de la donnée à la source. Une donnée invalide ne doit jamais entrer dans le pipeline, elle doit échouer à l'émission ('Fail Fast')."
-  - "Validation Multi-langage : Utilisez Pydantic ou Pandera pour matérialiser ces contrats en Python. Pour vos couches SQL, exploitez les 'Model Contracts' natifs de dbt pour garantir l'intégrité de vos tables finales."
+  - "Validation Multi-langage : Utilisez Pydantic ou Pandera pour matérialiser ces contrats en Python. Pour vos couches SQL, exploitez dbt pour garantir l'intégrité de vos tables finales."
   - "Isolation des Changements : Les contrats empêchent les 'silent failures' causées par des modifications de schémas en amont. C'est l'API de votre base de données."
-  - "Confiance & Vélocité : Sans contrats, l'équipe data passe 80% de son temps à nettoyer; avec contrats, elle passe 100% de son temps à créer de la valeur métier."
+  - "Confiance & Vélocité : Sans contrats, l'équipe data passe 80% de son temps à nettoyer ; avec contrats, elle passe 100% de son temps à créer de la valeur métier."
+references:
+  - "Chad Sanderson (Data Contracts)"
+  - "dbt (Model Contracts)"

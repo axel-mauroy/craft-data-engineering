@@ -7,3 +7,6 @@ content:
   - "Métriques de Santé (SLAs/SLOs) : Définissez des indicateurs clairs sur la qualité de votre donnée. Un artisan sait quand son oeuvre dévie de la perfection et agit avant la rupture."
   - "Alerting Intelligent : Évitez la fatigue des alertes. Ne notifiez que sur des événements actionnables et critiques. Une alerte qui n'entraîne pas d'action est un bruit polluant."
   - "Lineage & Impact : Visualisez le parcours de la donnée. Comprendre l'impact d'une modification en amont est la base de la maintenance sereine d'un écosystème complexe."
+references:
+  - "Elementary Data (dbt-native)"
+  - "Elastic Stack (ELK)"

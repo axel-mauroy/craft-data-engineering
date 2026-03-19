@@ -7,3 +7,6 @@ content:
   - "Linters & Formatters : Utilisez Ruff pour automatiser l'excellence typographique du code. Ne laissez jamais un débat sur les indentations polluer vos revues de code."
   - "Fonctions pures & Effets de bord : Isolez vos transformations pour les rendre prévisibles, réutilisables et surtout, testables unitairement."
   - "Refactoring constant : Le code est une matière vivante. Si vous trouvez une zone d'ombre ou une fragilité, laissez-la plus propre que vous ne l'avez trouvée. Refactoring != Rewrite : à pratiquer avec modération !"
+references:
+  - "Robert C. Martin (SOLID)"
+  - "Astronome (Ruff)"

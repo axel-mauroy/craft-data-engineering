@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Self
 
 @dataclass(frozen=True)
@@ -8,6 +8,7 @@ class PageContent:
     title: str
     subtitle: str
     content: list[str]
+    references: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:

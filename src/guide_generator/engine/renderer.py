@@ -67,9 +67,37 @@ class GuideRenderer(FPDF):
             else:
                 html_line = text_line
 
-            # 3. Handle any remaining ** markers (convert them to <b>)
+            # 3. Handle markdown links [text](url) -> <a href="url">text</a>
+            import re
+            link_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
+            # We wrap the link in a span or just use a to set the color if write_html supports it
+            # fpdf2's write_html supports basic <a> tags.
+            html_line = re.sub(link_pattern, r'<a href="\2">\1</a>', html_line)
+
+            # 4. Handle any remaining ** markers (convert them to <b>)
             while "**" in html_line:
                 html_line = html_line.replace("**", "<b>", 1).replace("**", "</b>", 1)
             
+            # Since write_html doesn't automatically blue-ify links, we might need a style
             self.write_html(html_line)
             self.ln(self._ds.body_style.line_height / 1.5)
+
+        # References Footer
+        if page_content.references:
+            # Disable auto page break temporarily to place the footer at the bottom
+            self.set_auto_page_break(False)
+            
+            self._apply_type_style(self._ds.reference_style)
+            ref_text = "Ref : " + ", ".join(page_content.references)
+            
+            # Calculate height needed for multi_cell
+            # Each line is roughly 4-5mm. We'll set Y accordingly.
+            h = 5 # line height for references
+            wrapped_lines = len(self.multi_cell(0, h, ref_text, dry_run=True, output="LINES"))
+            total_h = wrapped_lines * h
+            
+            self.set_y(-(15 + total_h)) # 15 for the main footer + our height
+            self.multi_cell(0, h, ref_text, align="L")
+            
+            # Restore auto page break
+            self.set_auto_page_break(True, margin=self._ds.margins["bottom"])

@@ -26,6 +26,7 @@ class DesignSystem:
     subtitle_style: TypeStyle
     body_style: TypeStyle
     footer_style: TypeStyle
+    reference_style: TypeStyle
     color_palette: dict[str, tuple[int, int, int]]
 
     @classmethod
@@ -41,5 +42,6 @@ class DesignSystem:
             subtitle_style=TypeStyle.from_dict(topo["subtitle"]),
             body_style=TypeStyle.from_dict(topo["body"]),
             footer_style=TypeStyle.from_dict(topo["footer"]),
+            reference_style=TypeStyle.from_dict(topo["reference"]),
             color_palette=palette
         )

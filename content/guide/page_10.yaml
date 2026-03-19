@@ -8,3 +8,6 @@ content:
   - "Déploiements Sécurisés : Adoptez des stratégies Blue/Green ou Canary pour vos pipelines critiques. Ne remplacez jamais une donnée vitale sans un plan de rollback testé et validé."
   - "Versioning & Provenance : Documentez l'origine de chaque dataset. La capacité à remonter du chiffre final au commit exact du pipeline est la marque d'un système mature."
   - "L'Esprit DataOps : Plus qu'une suite d'outils, c'est l'engagement de l'équipe envers la livraison continue de valeur métier fiable, rapide et sans dette technique."
+references:
+  - "Docker (Multi-stage)"
+  - "DataOps Manifesto"

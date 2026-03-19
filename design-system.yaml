@@ -34,3 +34,8 @@ typography:
     style: ""
     size: 10
     color_rgb: [71, 85, 105]
+  reference:
+    font_family: Helvetica
+    style: I
+    size: 9
+    color_rgb: [71, 85, 105]

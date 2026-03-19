@@ -3,8 +3,11 @@ title: "Idempotence & Stratégies d'écriture"
 subtitle: "Garantir la fiabilité par la répétabilité"
 content:
   - "L'Idempotence (Principle) : Un pipeline doit être rejouable à l'infini sur une période donnée sans altérer le résultat final. C'est la base de la résilience en Data Engineering."
-  - "Change Data Capture (CDC) : Capturer les événements à la source (Debezium, Fivetran) plutôt que de poller les tables. C'est l'assurance d'une ingestion fidèle sans perte d'historique."
+  - "Change Data Capture (CDC) : Capturer les événements à la source plutôt que de poller les tables. C'est l'assurance d'une ingestion fidèle sans perte d'historique."
   - "Stratégie Merge (dbt) : Indispensable pour les SCD Type 1. Elle synchronise les états en mettant à jour l'existant et en insérant le nouveau via une `unique_key` explicite."
   - "Insert Overwrite : La stratégie de choix pour les architectures Big Data partitionnées. Elle remplace dynamiquement des partitions entières, assurant une isolation parfaite."
   - "Microbatch (dbt 1.9+) : Pour les flux massifs de séries temporelles. Traitez vos données par fenêtres temporelles isolées pour minimiser l'impact des reprises sur erreur."
   - "Delete+Insert : Une approche 'brute' mais efficace pour les moteurs sans support du Merge. Elle garantit l'absence de doublons en nettoyant la cible avant l'insertion."
+references:
+  - "dbt (Incremental Strategies)"
+  - "Debezium & Fivetran (CDC)"
