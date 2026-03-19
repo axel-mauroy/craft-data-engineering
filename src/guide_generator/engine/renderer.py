@@ -46,9 +46,30 @@ class GuideRenderer(FPDF):
         self.ln(10)
         
         # Content
-        self._apply_type_style(self._ds.body_style)
         for line in page_content.content:
-            # Simple bullet point if the line starts with a dash or just text
-            text = f"- {line}" if not line.startswith("-") else line
-            self.multi_cell(0, self._ds.body_style.line_height, text)
-            self.ln(3)
+            self._apply_type_style(self._ds.body_style)
+            
+            # 1. Ensure it looks like a bullet
+            text_line = line.strip()
+            if not text_line.startswith("-"):
+                text_line = f"- {text_line}"
+            
+            # 2. Automatically bold the part before the first colon (:) if it exists
+            # Example: "- Title : Description" -> "- <b>Title :</b> Description"
+            if ":" in text_line and "<b>" not in text_line and "**" not in text_line:
+                parts = text_line.split(":", 1)
+                html_line = f"{parts[0]} :</b>{parts[1]}"
+                # Shift the <b> after the bullet dash
+                if html_line.startswith("- "):
+                    html_line = f"- <b>{html_line[2:]}"
+                else:
+                    html_line = f"<b>{html_line}"
+            else:
+                html_line = text_line
+
+            # 3. Handle any remaining ** markers (convert them to <b>)
+            while "**" in html_line:
+                html_line = html_line.replace("**", "<b>", 1).replace("**", "</b>", 1)
+            
+            self.write_html(html_line)
+            self.ln(self._ds.body_style.line_height / 1.5)

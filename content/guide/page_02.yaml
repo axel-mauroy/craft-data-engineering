@@ -2,7 +2,7 @@ page_number: 2
 title: "Environnement & Productivité"
 subtitle: "Tooling propre, esprit serein"
 content:
-  - "Automatisez tout ce qui est répétitif. Si vous le faites plusieurs fois par jour, scriptez-le. Un artisan ne perd pas son temps sur des tâches répétitives."
+  - "Automatisez tout ce qui est répétitif : Si vous le faites plusieurs fois par jour, scriptez-le. Un artisan ne perd pas son temps sur des tâches répétitives."
   - "Utilisez des gestionnaires de dépendances modernes : 'uv' en Python est devenu le standard de rapidité et de fiabilité pour vos projets."
   - "Maîtrisez votre IDE : Les raccourcis clavier et la navigation intelligente sont vos outils de précision pour manipuler votre base de code sans friction."
   - "IA & Productivité : Adoptez un IDE agentique comme Antigravity pour démultiplier votre capacité de refactoring complexe et de génération de code conforme aux standards 'Craft'."
