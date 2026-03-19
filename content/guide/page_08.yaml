@@ -1,6 +1,6 @@
 page_number: 8
 title: "IaC & Sécurité"
-subtitle: "De l'infrastructure cliquable à l'artisanat reproductible"
+subtitle: "L'industrialisation de l'infrastructure"
 content:
   - "Infrastructure as Code (Principle) : La console Cloud est en lecture seule. Toute ressource (Bucket, BigQuery, IAM) doit être définie par le code (Terraform, Pulumi) pour garantir la reproductibilité et l'auditabilité."
   - "Immutable Infrastructure : On ne modifie pas un serveur ou une table manuellement. On déploie une nouvelle version via le code. C'est l'assurance d'un état connu et maîtrisé."

@@ -3,7 +3,7 @@ title: "DataOps & CI/CD"
 subtitle: "L'usine à pipelines de confiance"
 content:
   - "Automatisation Totale (CI/CD) : Chaque commit est une promesse de qualité. Automatisez vos tests unitaires, d'intégration et de qualité de donnée pour rejeter l'erreur avant la production."
-  - "Docker Multi-stage Builds : Optimisez vos images pour la production. Séparez l'étape de construction de l'étape d'exécution pour garantir des containers légers, rapides et hautement sécurisés."
+  - "Docker Multi-stage Builds : Optimisez vos images pour la production. [Exemple Dockerfile (Expert uv)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/Dockerfile). Séparez l'étape de construction de l'étape d'exécution pour garantir des containers légers et sécurisés."
   - "Environnement de Test Isolé : Utilisez des 'Slim CI' ou des environnements éphémères pour valider vos transformations sur un échantillon réel sans polluer les datalakes de production."
   - "Déploiements Sécurisés : Adoptez des stratégies Blue/Green ou Canary pour vos pipelines critiques. Ne remplacez jamais une donnée vitale sans un plan de rollback testé et validé."
   - "Versioning & Provenance : Documentez l'origine de chaque dataset. La capacité à remonter du chiffre final au commit exact du pipeline est la marque d'un système mature."
