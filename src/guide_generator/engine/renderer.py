@@ -19,13 +19,62 @@ class GuideRenderer(FPDF):
         pass
 
     def footer(self):
+        # Hide footer on cover page (page 1)
+        if self.page_no() == 1:
+            return
+            
         self.set_y(-15)
         self._apply_type_style(self._ds.footer_style)
         
         # LinkedIn on the left, Page number on the right
         self.cell(0, 10, "linkedin.com/in/axel-mauroy-5699509a", link="https://www.linkedin.com/in/axel-mauroy-5699509a")
         self.set_x(self._ds.margins["left"])
-        self.cell(0, 10, f"Page {self.page_no()}", align="R")
+        # Display page number - 1 because page 1 is the cover
+        self.cell(0, 10, f"Page {self.page_no() - 1}", align="R")
+
+    def render_cover(self, page_content: PageContent):
+        self.add_page()
+        self.set_y(self.h / 4) # Start at 1/4 height
+        
+        # Big Title
+        self.set_font(self._ds.title_style.font_family, "B", 36)
+        self.set_text_color(*self._ds.title_style.color_rgb)
+        self.multi_cell(0, 20, page_content.title, align="C")
+        self.ln(5)
+        
+        # Subtitle
+        self.set_font(self._ds.subtitle_style.font_family, "I", 18)
+        self.set_text_color(*self._ds.subtitle_style.color_rgb)
+        self.multi_cell(0, 12, page_content.subtitle, align="C")
+        
+        # Vertical accent line
+        self.ln(20)
+        self.set_draw_color(*self._ds.color_palette["accent"])
+        self.set_line_width(1.5)
+        x_center = self.w / 2
+        self.line(x_center - 30, self.get_y(), x_center + 30, self.get_y())
+        
+        # Author info at the bottom-center
+        self.set_y(-70)
+        self.set_font(self._ds.title_style.font_family, "B", 18)
+        self.set_text_color(*self._ds.color_palette["midnight"])
+        self.cell(0, 10, "Axel Mauroy", align="C", ln=True)
+        
+        self.set_font(self._ds.body_style.font_family, "", 14)
+        self.set_text_color(*self._ds.color_palette["arctic_slate"])
+        self.cell(0, 8, "Consultant Data Engineering & Cloud Architecture", align="C", ln=True)
+        self.ln(5)
+        
+        # Contact Blocks
+        self.set_font(self._ds.body_style.font_family, "", 12)
+        self.set_text_color(*self._ds.color_palette["accent"])
+        
+        # Mail
+        self.set_x(self._ds.margins["left"])
+        self.cell(0, 8, "axel.mauroy@gmail.com", align="C", ln=True, link="mailto:axel.mauroy@gmail.com")
+        
+        # LinkedIn
+        self.cell(0, 8, "linkedin.com/in/axel-mauroy-5699509a", align="C", ln=True, link="https://www.linkedin.com/in/axel-mauroy-5699509a")
 
     def render_page(self, page_content: PageContent):
         self.add_page()

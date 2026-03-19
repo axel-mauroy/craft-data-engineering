@@ -23,7 +23,10 @@ def generate():
     # 3. Render PDF
     renderer = GuideRenderer(ds)
     for page in pages:
-        renderer.render_page(page)
+        if page.page_number == 0:
+            renderer.render_cover(page)
+        else:
+            renderer.render_page(page)
 
     # 4. Output
     renderer.output(str(output_path))
