@@ -8,7 +8,7 @@ content:
   - "**Ubiquitous Language :** Le vocabulaire métier dicte le nom des champs. Si le métier parle de 'Date de Commande', on modélise `dateCommande`, documenté dans Collibra et synchronisé avec dbt (via meta)."
   - "**Data Contracts (dbt >= 1.10) :** Les modèles d'interface (Ventes vers Compta) doivent avoir des contrats stricts (typage fort, nullité, sémantique). Elementary teste ces contrats en continu pour garantir qu'aucune anomalie ne casse les flux."
   - "**Architecture dbt Mesh :** Utilisez dependencies.yml pour des dépôts Git séparés (Multi-projets) ou un Monorepo partitionné par dossiers métiers (ex: `models/sales/`, `models/supplyChain/`)."
-  - "**Modélisation SQL d'Expert :** Exploitez le partitionnement et le clustering natifs BigQuery. [Voir l'exemple fctFacture.sql](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/fctFacture.sql)."
+  - "**Modélisation SQL d'Expert :** Exploitez le partitionnement et le clustering natifs BigQuery. [Voir fctFacture.sql](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/fctFacture.sql) & [Isolation du Domaine (domain.sql)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/domain.sql)."
 references:
   - "Eric Evans (DDD)"
   - "Alistair Cockburn (Ports & Adapters)"
