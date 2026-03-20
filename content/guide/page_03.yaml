@@ -6,7 +6,7 @@ content:
   - "**Le DDD stratégique, le 'quoi' :** Cartographie du territoire et identification des contextes. C'est décider quel contexte est coeur de métier (Core) et lequel est générique."
   - "**Le DDD tactique, le 'comment' :** Modélisation via entities, aggregates, value objects et repositories. En Data Engineering, un **Aggregate** est l'unité atomique de donnée : on ne doit jamais couper ses invariants entre deux modèles dbt."
   - "**Priorité Stratégique :** La tactique sans stratégie est vouée à l'échec : c'est poser des fenêtres sur une maison sans fondations. Mener une réflexion stratégique (frontières claires) prime sur la perfection de la mise en oeuvre initiale."
-  - "**Méthodologie de Transition :** Le DDD stratégique (interviews, analyse) clarifie la vision à la cible. Le refactoring se fait ensuite en douceur via [Strangler Fig](https://martinfowler.com/bliki/StranglerFigApplication.html) ou [Mikado](https://mikadomethod.org/)."
+  - "**Méthodologie de Transition :** Le DDD stratégique (interviews, analyse) clarifie la vision à la cible. Le refactoring se fait ensuite en douceur via [Strangler Fig](https://martinfowler.com/bliki/StranglerFigApplication.html) ou [Mikado](https://mikadomethod.info/)."
   - "### Patterns d'Implémentation"
   - "**Bounded Contexts (Mapping) :** Traduisez le DDD en objets physiques. Le domaine 'Ventes' écrit dans `prdSalesDomain`, isolé du domaine 'Logistics'."
   - "**Anti-Corruption Layer (ACL) :** Pattern de traduction entre domaines. Pour éviter que le schéma 'Logistics' ne vienne **polluer** le domaine 'Sales', créez un modèle intercalaire (ex: `stg_logistics_for_sales.sql`) qui adapte et nettoie la donnée entrante."
