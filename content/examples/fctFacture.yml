@@ -1,7 +1,6 @@
 # fctFacture.yml (dbt Model Contract)
 # Ce fichier définit le contrat formel pour le modèle fctFacture.sql
 
-models:
   - name: fctFacture
     description: "Modèle de faits centralisant les factures agrégées par factureId (Data Contract)"
     config:
@@ -13,8 +12,10 @@ models:
         description: "Identifiant unique de la facture (Clé primaire)"
         data_type: string
         constraints:
-          - type: primary_key
           - type: not_null
+        tests:
+          - unique
+          - not_null
 
       - name: clientId
         description: "Identifiant du client associé"
@@ -48,7 +49,7 @@ models:
 
       - name: quantiteTotaleArticles
         description: "Nombre total d'articles dans la facture"
-        data_type: int64
+        data_type: integer
         constraints:
           - type: not_null
 

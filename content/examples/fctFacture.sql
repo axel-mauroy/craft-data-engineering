@@ -1,4 +1,4 @@
--- fctFacture.sql (BigQuery & dbt Model)
+-- fctFacture.sql (dbt Model)
 -- Logic: Aggregate invoice lines and link to client
 
 {{
