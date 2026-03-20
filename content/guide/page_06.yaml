@@ -14,7 +14,15 @@ content:
     **I - Interface Segregation Principle :** Ne force pas un consommateur à dépendre de données dont il n'a pas besoin. En dbt Mesh : le domaine Compta ne doit pas consommer le modèle `fctFactureEnrichie` entier si seuls `factureId` et `montantTtc` lui sont utiles. Expose des interfaces minimales via `metrics:` ou des modèles d'interface dédiés.
 
     **D - Dependency Inversion Principle :** Les modules de haut niveau ne doivent pas dépendre des modules de bas niveau - les deux doivent dépendre d'abstractions. En Data Engineering : ton pipeline métier ne doit pas importer `google.cloud.bigquery` directement. Il doit dépendre d'une interface `DataWarehouseRepository` que BigQuery, DuckDB ou Snowflake implémentent. C'est exactement le pattern Repository du DDD tactique (page 3).
-  - "**Nommage & Intention :** Donnez un but clair à chaque variable. `df_cleaned` est une défaite ; préférez `factures_validees_sans_doublons`. Le nom doit porter la sémantique de la donnée."
+  - |
+    **Nommage & Intention :** Donnez un but clair à chaque variable. `df_cleaned` est une défaite ; préférez `factures_validees`.
+
+    `factures_validees_sans_doublons` viole plusieurs principes établis :
+    - **Clean Code (Martin) :** Le nom doit exprimer l'intention, pas l'implémentation. `sans_doublons` documente le *comment* (déduplication), pas le *quoi*.
+    - **Ubiquitous Language (Evans) :** Le nom doit appartenir au vocabulaire métier. `sans_doublons` est un artefact technique invisible au domaine.
+    - **SLAP (Single Level of Abstraction Principle) :** Mélanger la sémantique métier (`validees`) et le détail technique (`sans_doublons`) dans un même identifiant crée une fuite d'abstraction.
+
+    La déduplication est un invariant garanti par la couche de transformation - elle n'a pas à apparaître dans le nom de la variable résultante, exactement comme on n'écrit pas `liste_triee_sans_null` mais `collaborateurs_actifs`.
   - "**L'Automatisme de la Qualité :** Ne laissez jamais un débat sur l'indentation polluer une revue de code. Utilisez **Ruff** (par Astral) pour le Python et **SQLFluff** pour le SQL/dbt."
   - "**Fonctions Pures & Isolation :** Isolez vos calculs métiers dans des fonctions sans effets de bord. Cela les rend prévisibles, réutilisables et surtout, testables unitairement."
   - "**Refactoring vs Rewrite :** Le refactoring est une amélioration continue et sécurisée de la structure sans changer le comportement. Ne confondez pas 'nettoyer' et 'tout réécrire'."
