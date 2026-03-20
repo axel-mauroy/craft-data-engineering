@@ -24,6 +24,7 @@ class DesignSystem:
     page_format: str
     title_style: TypeStyle
     subtitle_style: TypeStyle
+    section_header_style: TypeStyle
     body_style: TypeStyle
     footer_style: TypeStyle
     reference_style: TypeStyle
@@ -40,6 +41,7 @@ class DesignSystem:
             page_format=raw["layout"]["page_format"],
             title_style=TypeStyle.from_dict(topo["title"]),
             subtitle_style=TypeStyle.from_dict(topo["subtitle"]),
+            section_header_style=TypeStyle.from_dict(topo["section_header"]),
             body_style=TypeStyle.from_dict(topo["body"]),
             footer_style=TypeStyle.from_dict(topo["footer"]),
             reference_style=TypeStyle.from_dict(topo["reference"]),

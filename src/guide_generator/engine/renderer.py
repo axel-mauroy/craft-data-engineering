@@ -96,13 +96,25 @@ class GuideRenderer(FPDF):
         # Content
         for line in page_content.content:
             self._apply_type_style(self._ds.body_style)
-            
-            # 1. Ensure it looks like a bullet
             text_line = line.strip()
+
+            # 1. Handle Section Headers (e.g., "### Title")
+            if text_line.startswith("### "):
+                header_text = text_line[4:].strip()
+                self.ln(self._ds.body_style.line_height / 2) # Extra space before header
+                self._apply_type_style(self._ds.section_header_style)
+                # Ensure it's bolded in HTML too if needed, but the style should handle it
+                self.write_html(f"<b>{header_text}</b>")
+                self.ln(self._ds.body_style.line_height)
+                continue
+
+            self._apply_type_style(self._ds.body_style)
+            
+            # 2. Ensure it looks like a bullet
             if not text_line.startswith("-"):
                 text_line = f"- {text_line}"
             
-            # 2. Automatically bold the part before the first colon (:) if it exists
+            # 3. Automatically bold the part before the first colon (:) if it exists
             # Example: "- Title : Description" -> "- <b>Title :</b> Description"
             if ":" in text_line and "<b>" not in text_line and "**" not in text_line:
                 parts = text_line.split(":", 1)
@@ -115,7 +127,7 @@ class GuideRenderer(FPDF):
             else:
                 html_line = text_line
 
-            # 3. Handle markdown links [text](url) -> <a href="url">text</a>
+            # 4. Handle markdown links [text](url) -> <a href="url">text</a>
             import re
             link_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
             # We wrap the link in a span or just use a to set the color if write_html supports it

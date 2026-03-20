@@ -23,6 +23,11 @@ typography:
     style: I
     size: 14
     color_rgb: [59, 130, 246]
+  section_header:
+    font_family: Helvetica
+    style: B
+    size: 13
+    color_rgb: [59, 130, 246]
   body:
     font_family: Helvetica
     style: ""
