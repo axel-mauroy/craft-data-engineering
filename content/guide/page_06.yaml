@@ -5,15 +5,15 @@ content:
   - |
     **SOLID en Data Engineering :** Appliquez les fondamentaux pour des pipelines robustes.
 
-    **S — Single Responsibility :** Appliqué à dbt : un modèle = une transformation = une responsabilité unique.
+    **S - Single Responsibility :** Appliqué à dbt : un modèle = une transformation = une responsabilité unique.
 
-    **O — Open/Closed Principle :** Un pipeline doit être ouvert à l'extension, fermé à la modification. En dbt, tu n'édites pas un modèle existant pour ajouter une nouvelle règle métier — tu crées un nouveau modèle en aval qui étend le comportement. La macro `calculer_remise` de la page 3 en est l'exemple : ajouter un statut GOLD n'implique pas de modifier les modèles consommateurs.
+    **O - Open/Closed Principle :** Un pipeline doit être ouvert à l'extension, fermé à la modification. En dbt, tu n'édites pas un modèle existant pour ajouter une nouvelle règle métier - tu crées un nouveau modèle en aval qui étend le comportement. La macro `calculer_remise` de la page 3 en est l'exemple : ajouter un statut GOLD n'implique pas de modifier les modèles consommateurs.
 
-    **L — Liskov Substitution Principle :** Toute implémentation d'une interface doit être substituable sans casser le consommateur. En Data Engineering : si tu remplaces `stg_factures_bigquery.sql` par `stg_factures_snowflake.sql`, le modèle `fctFacture.sql` ne doit pas le savoir. C'est l'architecture hexagonale de la page 3 — l'Adapter est substituable, le Domain reste intact.
+    **L - Liskov Substitution Principle :** Toute implémentation d'une interface doit être substituable sans casser le consommateur. En Data Engineering : si tu remplaces `stg_factures_bigquery.sql` par `stg_factures_snowflake.sql`, le modèle `fctFacture.sql` ne doit pas le savoir. C'est l'architecture hexagonale de la page 3 - l'Adapter est substituable, le Domain reste intact.
 
-    **I — Interface Segregation Principle :** Ne force pas un consommateur à dépendre de données dont il n'a pas besoin. En dbt Mesh : le domaine Compta ne doit pas consommer le modèle `fctFactureEnrichie` entier si seuls `factureId` et `montantTtc` lui sont utiles. Expose des interfaces minimales via `metrics:` ou des modèles d'interface dédiés.
+    **I - Interface Segregation Principle :** Ne force pas un consommateur à dépendre de données dont il n'a pas besoin. En dbt Mesh : le domaine Compta ne doit pas consommer le modèle `fctFactureEnrichie` entier si seuls `factureId` et `montantTtc` lui sont utiles. Expose des interfaces minimales via `metrics:` ou des modèles d'interface dédiés.
 
-    **D — Dependency Inversion Principle :** Les modules de haut niveau ne doivent pas dépendre des modules de bas niveau — les deux doivent dépendre d'abstractions. En Data Engineering : ton pipeline métier ne doit pas importer `google.cloud.bigquery` directement. Il doit dépendre d'une interface `DataWarehouseRepository` que BigQuery, DuckDB ou Snowflake implémentent. C'est exactement le pattern Repository du DDD tactique (page 3).
+    **D - Dependency Inversion Principle :** Les modules de haut niveau ne doivent pas dépendre des modules de bas niveau - les deux doivent dépendre d'abstractions. En Data Engineering : ton pipeline métier ne doit pas importer `google.cloud.bigquery` directement. Il doit dépendre d'une interface `DataWarehouseRepository` que BigQuery, DuckDB ou Snowflake implémentent. C'est exactement le pattern Repository du DDD tactique (page 3).
   - "**Nommage & Intention :** Donnez un but clair à chaque variable. `df_cleaned` est une défaite ; préférez `factures_validees_sans_doublons`. Le nom doit porter la sémantique de la donnée."
   - "**L'Automatisme de la Qualité :** Ne laissez jamais un débat sur l'indentation polluer une revue de code. Utilisez **Ruff** (par Astral) pour le Python et **SQLFluff** pour le SQL/dbt."
   - "**Fonctions Pures & Isolation :** Isolez vos calculs métiers dans des fonctions sans effets de bord. Cela les rend prévisibles, réutilisables et surtout, testables unitairement."
