@@ -7,18 +7,18 @@
 */
 
 -- Correspondance avec l'Architecture Hexagonale :
--- | Couche  | Rôle                      | Outil dbt / Craft           |
--- |---------|---------------------------|-----------------------------|
+-- | Couche  | Rôle                      | Outil dbt / Craft            |
+-- |---------|---------------------------|------------------------------|
 -- | Domain  | Règle pure, testable      | Python model / Conceptuel    |
 -- | Port    | Interface déclarée        | Macro Jinja (Contrat)        |
--- | Adapter | Assemblage infrastructure | Modèle SQL fct*.sql         |
+-- | Adapter | Assemblage infrastructure | Modèle SQL fct*.sql          |
 -- | Test    | Vérification du contrat   | dbt Unit Test (Component)    |
 
 
 -- ❌ L'ANTI-PATTERN : Logique couplée au moteur technique
 -- Pourquoi c'est fragile : 
 -- 1. Couplage Métier : La règle de remise est noyée dans le SQL.
--- 2. Couplage Infra : Dépendance au type de données et fonctions système (CURRENT_DATE).
+-- 2. Couplage Infra : Dépendance aux fonctions système (CURRENT_DATE).
 -- 3. Testabilité : Impossible à tester sans charger la base de données.
 
 SELECT 
@@ -47,21 +47,26 @@ def calculer_remise_fidelite(statut_carte: str, montant_total: float) -> float:
     # Agnostique : ne sait rien de BigQuery ou SQL.
     if statut_carte == 'PREMIUM' and montant_total > 1000:
         return montant_total * 0.90
-    ...
+    if statut_carte == 'STANDARD' and montant_total > 500:
+        return montant_total * 0.95
+    return montant_total
 */
 
 
 -- Étape 2 : Le Port (Macro Jinja isolée)
--- On encapsule la règle dans une Macro. 
--- 💡 Note : C'est une isolation partielle (pragmatique). Les paramètres reçoivent 
+-- On encapsule la règle dans une Macro.
+-- 💡 Note : C'est une isolation partielle (pragmatique). Les paramètres reçoivent
 -- des expressions SQL (colonnes), pas des valeurs directes.
 -- Fichier: macros/domain_sales/calculer_remise.sql
 
 {% macro calculer_remise(colonne_statut, colonne_montant) %}
     CASE 
-        WHEN {{ colonne_statut }} = 'PREMIUM' AND {{ colonne_montant }} > 1000 THEN {{ colonne_montant }} * 0.90
-        WHEN {{ colonne_statut }} = 'STANDARD' AND {{ colonne_montant }} > 500 THEN {{ colonne_montant }} * 0.95
-        ELSE {{ colonne_montant }}
+        /* Utilisation de COALESCE pour garantir un typage robuste et éviter la propagation des NULLs */
+        WHEN COALESCE({{ colonne_statut }}, 'SANS_CARTE') = 'PREMIUM' AND COALESCE({{ colonne_montant }}, 0) > 1000 
+            THEN {{ colonne_montant }} * 0.90
+        WHEN COALESCE({{ colonne_statut }}, 'SANS_CARTE') = 'STANDARD' AND COALESCE({{ colonne_montant }}, 0) > 500 
+            THEN {{ colonne_montant }} * 0.95
+        ELSE COALESCE({{ colonne_montant }}, 0)
     END
 {% endmacro %}
 
@@ -89,12 +94,13 @@ unit_tests:
         - {factureId: 1, montantApresRemise: 1350}  -- PREMIUM > 1000 : -10%
         - {factureId: 2, montantApresRemise: 760}   -- STANDARD > 500 : -5%
         - {factureId: 3, montantApresRemise: 200}   -- < seuil : pas de remise
-        - {factureId: 4, montantApresRemise: 2000}  -- client inconnu : pas de remise
+        - {factureId: 4, montantApresRemise: 2000}  -- client inconnu (NULL) : pas de remise
 */
 
 
 -- Étape 4 : L'Adapter (Modèle SQL d'assemblage)
 -- Le modèle se contente de lier la logique du domaine aux sources de données.
+-- Fichier: models/sales/marts/fctFacturesEnrichies.sql
 
 SELECT 
     f.factureId,
