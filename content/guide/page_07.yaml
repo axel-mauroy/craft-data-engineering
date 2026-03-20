@@ -8,6 +8,7 @@ content:
   - "Microbatch (dbt 1.9+) : Pour les flux massifs de séries temporelles. Traitez vos données par fenêtres temporelles isolées pour minimiser l'impact des reprises sur erreur."
   - "Delete+Insert : Une approche 'brute' mais efficace pour les moteurs sans support du Merge. Elle garantit l'absence de doublons en nettoyant la cible avant l'insertion."
   - "Change Data Capture (CDC) : Capturer les événements à la source plutôt que de poller les tables. C'est l'assurance d'une ingestion fidèle sans perte d'historique."
+  - "**Optimisation BigQuery :** Exploitez le partitionnement (Date/Int) et le clustering (High-cardinality) pour minimiser le scan de données. Voir [fctFacture.sql](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/fctFacture.sql)."
 references:
   - "dbt (Incremental Strategies)"
   - "Debezium & Fivetran (CDC)"
