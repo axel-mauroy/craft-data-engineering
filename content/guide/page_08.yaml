@@ -2,7 +2,14 @@ page_number: 8
 title: "IaC & Sécurité"
 subtitle: "L'industrialisation de l'infrastructure"
 content:
-  - "Infrastructure as Code (Principle) : La console Cloud est en lecture seule. Toute ressource (Bucket, Dataset BigQuery, IAM) doit être définie par le code (Terraform, Pulumi) pour garantir la reproductibilité et l'auditabilité. On ne modifie rien manuellement, on déploie une nouvelle version via le code. C'est l'assurance d'un état connu et maîtrisé."
-  - "Secrets Management : Les secrets ne sont jamais en clair, ni dans le code, ni dans les logs. Utilisez des gestionnaires de secrets (GCP Secret Manager, HashiCorp Vault) injectés au runtime."
-  - "Least Privilege (IAM) : Appliquez le principe du moindre privilège à chaque service account. Un pipeline ne doit avoir que les permissions strictement nécessaires à son exécution."
-  - "Audit & Observabilité : Chaque changement d'infrastructure laisse une trace dans votre système de versioning (Git). Le 'ClickOps' (clics manuels dans la console) est la source principale des pannes difficiles à tracer."
+  - "**Infrastructure as Code (IaC) :** La console Cloud est en lecture seule. Toute ressource (Bucket, BigQuery, IAM) doit être définie par le code (**Terraform, Pulumi**) pour garantir la reproductibilité via Git."
+  - "**L'Anti-pattern du ClickOps :** Évitez les modifications manuelles en console. Le 'ClickOps' est la source principale de pannes indétectables et d'incohérences entre les environnements."
+  - "**Gestion du Drift :** Identifiez et corrigez immédiatement toute divergence (drift) entre l'état déclaré dans votre code et la réalité du Cloud. L'IaC est votre unique source de vérité."
+  - "**Reproductibilité des Environnements :** Déployez des stacks identiques en Dev, Staging et Prod en un clic. L'IaC garantit que 'ça marche en prod' si 'ça a marché en staging'."
+  - "**Secrets Management :** Ne stockez jamais de secrets en clair. Utilisez des coffres-forts (GCP Secret Manager, Vault) injectés au runtime pour une sécurité maximale."
+  - "**Le Principe du Moindre Privilège :** Appliquez l'IAM (Least Privilege) à chaque Service Account. Un pipeline ne doit posséder que les permissions strictement nécessaires à sa tâche."
+  - "**Auditabilité & Rollback :** Chaque changement d'infrastructure laisse une trace auditable dans votre historique de versioning, permettant un retour arrière (rollback) rapide et sûr."
+references:
+  - "HashiCorp (Terraform Best Practices)"
+  - "Google Cloud (IAM & Security)"
+  - "ThoughtWorks (Infrastructure as Code)"
