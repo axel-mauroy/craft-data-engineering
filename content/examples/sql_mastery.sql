@@ -75,20 +75,7 @@ commandesFiltrees AS (
         commandeId,
         clientId,
         montant,
-        dateCommande,
-        /*
-           7. WINDOW FUNCTIONS (Éviter la sous-requête corrélée)
-           --------------------------------------------------------------------------
-           ❌ ANTI-PATTERN : Sous-requête corrélée pour trouver la dernière commande
-           Exécutée ligne par ligne - O(n²) sur les gros volumes.
-
-           ✅ CRAFT PATTERN : Window function
-           Un seul scan, le moteur calcule le rang en parallèle par partition.
-        */
-        ROW_NUMBER() OVER (
-            PARTITION BY clientId 
-            ORDER BY dateCommande DESC
-        ) AS rang_commande
+        dateCommande
     FROM {{ ref('stg_commandes') }}
     /*
        3. PRÉDICATS SARGables (Search ARGument ABLE) & TYPAGE
@@ -102,6 +89,21 @@ commandesFiltrees AS (
     */
     WHERE dateCommande >= DATE '2024-01-01'
       AND dateCommande < DATE '2025-01-01'
+    /*
+       7. WINDOW FUNCTIONS & QUALIFY (L'élégance BigQuery / Snowflake)
+       --------------------------------------------------------------------------
+       ❌ ANTI-PATTERN : Sous-requête corrélée ou double CTE pour filtrer le rang.
+       Exécutée ligne par ligne - O(n²) sur les gros volumes.
+
+       ✅ CRAFT PATTERN : Window function + QUALIFY
+       Un seul scan. Le moteur calcule le rang et filtre le résultat dans 
+       la même passe d'exécution, rendant le code ultra-concis.
+    */
+    -- Filtre magique post-Window Function : on ne garde que la dernière commande !
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY clientId 
+        ORDER BY dateCommande DESC
+    ) = 1
 )
 
 -- Assemblage Final (Le "Paragraph" principal)
