@@ -11,6 +11,10 @@ content:
   - "**Culture de la Transmission :** Le craftsmanship est un compagnonnage. Partagez vos patterns et pratiquez la revue de code constructive."
   - "**Production-Ready by Design :** Anticipez l'échec. La résilience, l'observabilité et le monitoring sont intégrés dès le premier commit."
   - "**Supprimer la Friction :** Maintenez une [documentation vivante](https://www.sfeir.dev/documentation-as-code-definition/) et des environnements reproductibles pour qu'un nouvel arrivant soit autonome en moins d'une journée."
+  - "**Le Fossé Fondamental :** Code applicatif = comportement interactif, feedback en millisecondes. Data = transformations déclaratives, feedback en heures via la BI ou le monitoring. L'excellence data se mesure différemment."
+  - "**Le SQL est un langage noble :** Un modèle SQL bien structuré est aussi expressif qu'une fonction pure. La lisibilité, la modularité et la testabilité s'appliquent avec les outils du domaine. Voir [SQL Mastery (sql_mastery.sql)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/sql_mastery.sql)."
+  - "**Assumer les Limites :** Un pipeline batch ne fait pas d'événements de domaine. dbt ne gère pas d'invariants transactionnels. Ce guide travaille dans ces contraintes, pas contre elles."
+
 references:
   - "John Ousterhout (A Philosophy of Software Design)"
   - "Michael Nygard (Release It!)"
