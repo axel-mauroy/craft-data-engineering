@@ -13,6 +13,7 @@ content:
   - "**Supprimer la Friction :** Maintenez une [documentation vivante](https://www.sfeir.dev/documentation-as-code-definition/) et des environnements reproductibles pour qu'un nouvel arrivant soit autonome en moins d'une journée."
   - "**Le Fossé Fondamental :** Code applicatif = comportement interactif, feedback en millisecondes. Data = transformations déclaratives, feedback en heures via la BI ou le monitoring. L'excellence data se mesure différemment."
   - "**Le SQL est un langage noble :** Un modèle SQL bien structuré est aussi expressif qu'une fonction pure. La lisibilité, la modularité et la testabilité s'appliquent avec les outils du domaine. Voir [SQL Mastery (sql_mastery.sql)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/sql_mastery.sql)."
+  - "**L'Idempotence Absolue :** Un pipeline doit pouvoir s'exécuter 100 fois en produisant le même résultat. Sur BigQuery, l'incrémental maîtrisant l'I/O et le partitionnement est la clé. Voir [SQL Idempotence (sql_idempotence.sql)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/sql_idempotence.sql)."
   - "**Assumer les Limites :** Un pipeline batch ne fait pas d'événements de domaine. dbt ne gère pas d'invariants transactionnels. Ce guide travaille dans ces contraintes, pas contre elles."
 
 references:
