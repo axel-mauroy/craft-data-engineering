@@ -1,7 +1,7 @@
 # CRAFT PATTERN : TEST-DRIVEN DATA (TDD)
 **Le cycle "Red, Green, Refactor" appliqué au SQL**
 
-Le TDD en ingénierie de la donnée n'est pas une option, c'est un bouclier. Il force le Data Engineer à penser aux cas limites (valeurs manquantes, doublons, divisions par zéro) **avant** d'écrire la moindre ligne de transformation.
+Le TDD en ingénierie de la donnée n'est pas une option, c'est un bouclier. Il force le Data Engineer à penser aux cas limites (valeurs manquantes, doublons) **avant** d'écrire la moindre ligne de transformation.
 
 Le cycle se divise en 3 étapes strictes :
 
@@ -31,10 +31,16 @@ models:
     columns:
       - name: ligneId
         data_type: string
+      - name: dateTransaction
+        data_type: date
+      - name: magasinId
+        data_type: string
       - name: margeNette
         data_type: numeric
 
     # 2. Le Test Unitaire dbt (Le coeur du TDD)
+    # Note : le bloc `expect` peut ignorer les colonnes non testées (dateTransaction, magasinId).
+    # Les Unit Tests dbt 1.8+ ne vérifient que les colonnes explicitement déclarées dans `expect`.
     unit_tests:
       - name: test_calcul_marge_nette_edge_cases
         description: "Vérifie le calcul de la marge, y compris avec des données sales (NULL)."
@@ -70,11 +76,12 @@ Maintenant, nous écrivons le code SQL **strict minimum** pour satisfaire le tes
 {{ config(materialized='table') }}
 
 WITH lignes AS (
+    -- Phase GREEN : SELECT * volontaire. Le REFACTOR corrigera le contrat de colonnes.
     SELECT * FROM {{ ref('stg_lignes_facture') }}
 )
 
 SELECT
-    SAFE_CAST(ligneId AS STRING) AS ligneId,
+    ligneId,
     /*
        ✅ CRAFT PATTERN : La logique est dictée par les tests (TDD)
        Grâce à notre test sur les lignes L2 et L3, nous avons été FORCÉS 
@@ -128,13 +135,15 @@ WITH lignes AS (
         remise
     FROM {{ ref('stg_lignes_facture') }}
     {% if is_incremental() %}
-        -- Optimisation I/O : on ne scanne que les 3 derniers jours
+        -- ⚠️ Cette fenêtre de 3 jours est un choix architectural lié au SLA d'ingestion.
+        -- Les unit tests ne couvrent PAS ce filtre (is_incremental() = false en test).
+        -- Validez cette fenêtre via un test d'intégration séparé (ex: Elementary volume_anomalies).
         WHERE dateTransaction >= DATE_SUB(DATE '{{ run_started_at.strftime("%Y-%m-%d") }}', INTERVAL 3 DAY)
     {% endif %}
 )
 
 SELECT
-    SAFE_CAST(ligneId AS STRING) AS ligneId,
+    ligneId,
     dateTransaction,
     magasinId,
     SAFE_CAST(
