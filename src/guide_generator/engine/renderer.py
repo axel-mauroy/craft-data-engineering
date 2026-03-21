@@ -91,7 +91,7 @@ class GuideRenderer(FPDF):
         self.set_draw_color(*self._ds.color_palette["accent"])
         self.set_line_width(0.5)
         self.line(self.get_x(), self.get_y() + 2, self.get_x() + 50, self.get_y() + 2)
-        self.ln(10)
+        self.ln(7)
         
         # Content
         for line in page_content.content:
@@ -101,11 +101,11 @@ class GuideRenderer(FPDF):
             # 1. Handle Section Headers (e.g., "### Title")
             if text_line.startswith("### "):
                 header_text = text_line[4:].strip()
-                self.ln(self._ds.body_style.line_height / 2) # Extra space before header
+                self.ln(self._ds.body_style.line_height / 4) # Extra space before header
                 self._apply_type_style(self._ds.section_header_style)
                 # Ensure it's bolded in HTML too if needed, but the style should handle it
                 self.write_html(f"<b>{header_text}</b>")
-                self.ln(self._ds.body_style.line_height)
+                self.ln(self._ds.body_style.line_height / 1.5)
                 continue
 
             self._apply_type_style(self._ds.body_style)
@@ -140,7 +140,7 @@ class GuideRenderer(FPDF):
             
             # Since write_html doesn't automatically blue-ify links, we might need a style
             self.write_html(html_line)
-            self.ln(self._ds.body_style.line_height / 1.5)
+            self.ln(self._ds.body_style.line_height / 2)
 
         # References Footer
         if page_content.references:

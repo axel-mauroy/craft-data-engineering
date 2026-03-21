@@ -33,7 +33,7 @@ typography:
     style: ""
     size: 12
     color_rgb: [71, 85, 105]
-    line_height: 6
+    line_height: 7
   footer:
     font_family: Helvetica
     style: ""
