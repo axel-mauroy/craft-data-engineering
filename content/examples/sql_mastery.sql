@@ -57,8 +57,46 @@ commandesFiltrees AS (
 
 -- Assemblage Final (Le "Paragraph" principal)
 SELECT
+    /*
+       4. CONTRAT DE DONNÉES & EXPLICITÉ
+       ----------------------------------------------------------------------
+       ❌ ANTI-PATTERN : SELECT * ou SELECT c.clientId, cmd.*
+       Ceci crée une dépendance fragile. L'ajout d'une colonne en amont peut
+       casser le modèle en aval (notamment dans les vues ou les UNION).
+
+       ✅ CRAFT PATTERN : Contrat de données strict
+       On nomme explicitement chaque colonne sélectionnée, et on préfixe
+       toujours avec l'alias de la table pour éviter toute ambiguïté.
+    */
     c.clientId,
-    cmd.montant
+    cmd.commandeId,
+    cmd.montant,
+    cmd.dateCommande
 FROM clientsActifs c
-INNER JOIN commandesFiltrees cmd
+/*
+   5. CONSCIENCE DU FAN-OUT (JOINTURES)
+   --------------------------------------------------------------------------
+   ❌ ANTI-PATTERN : Joindre sans comprendre la cardinalité.
+   Un LEFT JOIN n'est pas inoffensif : s'il y a des doublons à droite, 
+   il va multiplier les lignes à gauche (Fan-out) et fausser les KPIs.
+
+   ✅ CRAFT PATTERN : Garantir l'unicité
+   Le Craftsman s'assure toujours que la clé de jointure de la table de droite
+   est unique (1:1 ou N:1). Si c'est 1:N, on agrège avant de joindre.
+*/
+LEFT JOIN commandesFiltrees cmd
     ON c.clientId = cmd.clientId
+
+/*
+   6. UNION ALL vs UNION (PERFORMANCE)
+   --------------------------------------------------------------------------
+   ❌ ANTI-PATTERN : Utiliser UNION par défaut
+   UNION force le moteur à faire un DISTINCT global caché (Tri + Dédoublonnage),
+   ce qui détruit les performances sur des gros volumes.
+
+   ✅ CRAFT PATTERN : Utiliser UNION ALL
+   Si les requêtes sont distinctes par nature, ou si les doublons sont gérés,
+   on utilise UNION ALL pour concaténer les blocs sans pénalité CPU.
+*/
+-- UNION ALL
+-- SELECT ...
