@@ -82,17 +82,17 @@ commandesFiltrees AS (
         ) AS rang_commande
     FROM {{ ref('stg_commandes') }}
     /*
-       3. PRÉDICATS SARGables (Search ARGument ABLE)
+       3. PRÉDICATS SARGables (Search ARGument ABLE) & TYPAGE
        ----------------------------------------------------------------------
        ❌ ANTI-PATTERN : WHERE EXTRACT(YEAR FROM dateCommande) = 2024
-       Ceci force le moteur à appliquer la fonction sur chaque ligne, 
-       ce qui invalide l'utilisation de l'index ou de la partition (Full Scan).
+       Force un Full Scan. Par ailleurs, `dateCommande >= '2024-01-01'` 
+       utilise un cast implicite (dangereux sur BigQuery).
 
-       ✅ CRAFT PATTERN : Filtre sur la colonne brute
-       Ceci permet d'utiliser le partitionnement ou clustering natif.
+       ✅ CRAFT PATTERN : Filtre sur colonne brute avec typage explicite
+       Garantit l'utilisation du partitionnement et des types robustes.
     */
-    WHERE dateCommande >= '2024-01-01'
-      AND dateCommande < '2025-01-01'
+    WHERE dateCommande >= DATE '2024-01-01'
+      AND dateCommande < DATE '2025-01-01'
 )
 
 -- Assemblage Final (Le "Paragraph" principal)
