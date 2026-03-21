@@ -10,13 +10,13 @@
    dbt n'est ici qu'un "Adapter de lecture" isolant la logique de calcul analytique.
 */
 
--- Correspondance avec l'Architecture Hexagonale :
+-- Correspondance avec l'Architecture Hexagonale (Mise à jour) :
 -- | Couche  | Rôle                      | Outil dbt / Craft            |
 -- |---------|---------------------------|------------------------------|
--- | Domain  | Règle pure, testable      | Python model / Conceptuel    |
--- | Port    | Interface déclarée        | Macro Jinja (Contrat)        |
--- | Adapter | Assemblage infrastructure | Modèle SQL fct*.sql          |
--- | Test    | Vérification du contrat   | dbt Unit Test (Component)    |
+-- | Domain  | KPI / Règle d'entreprise  | dbt Semantic Layer (YAML)    |
+-- | Port    | Interface / Composant DRY | Macro Jinja                  |
+-- | Adapter | Assemblage infrastructure | Modèle SQL (Marts)           |
+-- | Test    | Vérification du contrat   | dbt Unit Test / Data Test    |
 
 
 -- ❌ L'ANTI-PATTERN : Logique couplée au moteur technique
@@ -40,32 +40,17 @@ WHERE DATE(f.dateCreation) = CURRENT_DATE(); -- ⚠️ Couplage temporel d'infra
 
 /* 
    --------------------------------------------------------------------------
-   ✅ LA VISION "CRAFT" : Isolation de la Logique Analytique (Reporting)
+   ✅ LA VISION "CRAFT" : Isolation de la Logique Analytique
    --------------------------------------------------------------------------
 */
 
--- Étape 1 : Le Domaine Pur (Logique Métier Pure)
--- L'idéal théorique est une fonction pure (Python) sans aucune dépendance.
-/*
-def calculer_remise_fidelite(statut_carte: str, montant_total: float) -> float:
-    # Agnostique : ne sait rien de BigQuery ou SQL.
-    if statut_carte == 'PREMIUM' and montant_total > 1000:
-        return montant_total * 0.90
-    if statut_carte == 'STANDARD' and montant_total > 500:
-        return montant_total * 0.95
-    return montant_total
-*/
-
-
--- Étape 2 : Le Port (Macro Jinja isolée)
--- On encapsule la règle analytique dans une Macro.
--- 💡 Note : C'est une isolation partielle (pragmatique). dbt reste ici un "adapter de lecture" 
--- qui isole la logique de transformation du reste du pipeline.
+-- Étape 1 : Le composant réutilisable (Macro Jinja isolée)
+-- On encapsule la logique pure de transformation à la ligne dans une Macro pour rester DRY, 
+-- mais sans en abuser pour conserver la lisibilité du SQL.
 -- Fichier: macros/domain_sales/calculer_remise.sql
 
 {% macro calculer_remise(colonne_statut, colonne_montant) %}
     CASE 
-        /* Utilisation de COALESCE pour garantir un typage robuste et éviter la propagation des NULLs */
         WHEN COALESCE({{ colonne_statut }}, 'SANS_CARTE') = 'PREMIUM' AND COALESCE({{ colonne_montant }}, 0) > 1000 
             THEN {{ colonne_montant }} * 0.90
         WHEN COALESCE({{ colonne_statut }}, 'SANS_CARTE') = 'STANDARD' AND COALESCE({{ colonne_montant }}, 0) > 500 
@@ -75,41 +60,82 @@ def calculer_remise_fidelite(statut_carte: str, montant_total: float) -> float:
 {% endmacro %}
 
 
--- Étape 3 : Le Test de Composant (Vérification de l'assemblage)
--- dbt Unit Test permet de vérifier le contrat du Port utilisé par l'Adapter.
--- Fichier: models/sales/sales.yml
-/*
-unit_tests:
-  - name: test_regles_remise
-    model: fctFacturesEnrichies  # On teste l'assemblage (Component Test)
-    given:
-      - input: ref('stg_factures')
-        rows:
-          - {factureId: 1, clientId: 'C1', montantTotal: 1500}
-          - {factureId: 2, clientId: 'C2', montantTotal: 800}
-          - {factureId: 3, clientId: 'C1', montantTotal: 200}
-          - {factureId: 4, clientId: 'C_INCONNU', montantTotal: 2000}
-      - input: ref('stg_clients')
-        rows:
-          - {clientId: 'C1', statutCarteMaison: 'PREMIUM'}
-          - {clientId: 'C2', statutCarteMaison: 'STANDARD'}
-    expect:
-      rows:
-        - {factureId: 1, montantApresRemise: 1350}  -- PREMIUM > 1000 : -10%
-        - {factureId: 2, montantApresRemise: 760}   -- STANDARD > 500 : -5%
-        - {factureId: 3, montantApresRemise: 200}   -- < seuil : pas de remise
-        - {factureId: 4, montantApresRemise: 2000}  -- client inconnu (NULL) : pas de remise
-*/
-
-
--- Étape 4 : L'Adapter (Modèle SQL d'assemblage)
--- Le modèle se contente de lier la logique du domaine aux sources de données.
--- Fichier: models/sales/marts/fctFacturesEnrichies.sql
+-- Étape 2 : Le Modèle (Adapter) 
+-- Le SQL ne fait qu'assembler les briques.
+-- Fichier: models/marts/finance/fct_factures_remises.sql
 
 SELECT 
     f.factureId,
     c.clientId,
-    -- 🚀 Appel au domaine via le Port : la logique métier est isolée.
     {{ calculer_remise('c.statutCarteMaison', 'f.montantTotal') }} AS montantApresRemise
 FROM {{ ref('stg_factures') }} f
 LEFT JOIN {{ ref('stg_clients') }} c ON f.clientId = c.clientId;
+
+
+-- Étape 3 : Le Domaine Analytique Pur (dbt Semantic Layer)
+-- L'isolation ultime du KPI ne se fait plus en SQL, mais via MetricFlow (Semantic Layer).
+-- C'est ici que vit la "Règle de Reporting" pour garantir une cohérence parfaite dans tous les outils BI.
+-- Fichier: models/marts/finance/metrics.yml
+/*
+metrics:
+  - name: montant_total_remise
+    description: "Reconstitution analytique du montant total après l'application des remises fidélité."
+    type: sum
+    measure: montantApresRemise
+    # Le Semantic Layer gère ensuite dynamiquement le code, le cache et les jointures pour les outils BI.
+*/
+
+
+-- Étape 4 : Les Contrats et les Tests (La Garantie de l'Architecture)
+-- Pour aller au bout de l'Architecture Hexagonale, il faut distinguer :
+-- 1. Le "Model Contract" : garantit l'interface technique (le schéma attendu par les consommateurs).
+-- 2. Le "Unit Test" : garantit la logique métier (le Port) de manière isolée sans accès aux données réelles.
+-- 3. Le "Data Test" : garantit l'intégrité de la donnée en production (ex: pas de doublons post-jointure).
+-- Fichier: models/marts/finance/finance.yml
+/*
+models:
+  - name: fct_factures_remises
+    config:
+      materialized: table # 💡 Requis pour appliquer les contraintes de contrat
+      contract:
+        enforced: true # 🚀 GARANTIE DU PORT : Le modèle échouera si le schéma ne respecte pas ce contrat strict.
+    columns:
+      - name: factureId
+        data_type: integer
+        constraints:
+          - type: not_null
+      - name: clientId
+        data_type: string
+      - name: montantApresRemise
+        data_type: float
+
+unit_tests:
+  - name: test_regles_remise
+    model: fct_factures_remises
+    given:
+      - input: ref('stg_factures')
+        rows:
+          - {factureId: 1, clientId: 'C1', montantTotal: 1500}
+      - input: ref('stg_clients')
+        rows:
+          - {clientId: 'C1', statutCarteMaison: 'PREMIUM'}
+    expect:
+      rows:
+        - {factureId: 1, montantApresRemise: 1350}
+*/
+
+
+/*
+   ==========================================================================
+   💡 EN RÉSUMÉ :
+   Gardez l'idée de la Macro Jinja comme équivalent d'une fonction (Port) 
+   pour modulariser les calculs répétitifs au niveau de la ligne, mais introduisez 
+   le dbt Semantic Layer comme l'outil moderne (le vrai "Domain" analytique) pour 
+   définir, isoler et gouverner vos KPIs et métriques d'entreprise. 
+   
+   Sublimez votre approche avec les Model Contracts (contract: {enforced: true}) 
+   pour sceller l'interface technique du Port de l'architecture hexagonale.
+   N'oubliez pas non plus d'insister sur les Unit Tests (pour valider la 
+   règle métier "à vide") et les Data Tests (pour garantir l'intégrité en production) !
+   ==========================================================================
+*/
