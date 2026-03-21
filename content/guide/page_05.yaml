@@ -2,7 +2,7 @@ page_number: 5
 title: "Stratégie de Test & Qualité"
 subtitle: "La donnée est du code : testez-la"
 content:
-  - "**La Pyramide de Test Data :** Hiérarchisez vos efforts : Tests Unitaires sur la logique pure (Jinja, Python), Tests d'Intégration sur les connecteurs, et Tests de Qualité (E2E) sur les datasets terminaux."
+  - "**La Pyramide de Test Data :** Hiérarchisez vos efforts : Tests Unitaires (dbt v1.8+), Tests d'Intégration & de Contrat, et Observabilité Statistique via **Elementary**. Voir [Testing Mastery (test_mastery.md)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/test_mastery.md)."
   - "**Test-Driven Data (TDD) :** Définissez vos attentes (nullité, unicité, distribution) avant d'écrire la transformation via des outils comme **dbt tests**, **Great Expectations** ou **Soda**. C'est votre contrat de santé."
   - "**Fail-Fast Checkpoints :** Intégrez des validations bloquantes dans votre orchestrateur. Si la donnée ne respecte pas le contrat, le pipeline s'arrête immédiatement pour protéger les systèmes en aval."
   - "**Environnements Éphémères (Testcontainers) :** Validez vos connecteurs (ex: SQLAlchemy vers PostgreSQL) en isolant l'infrastructure. Utilisez des containers jetables pour garantir des tests reproductibles et sans effets de bord."
@@ -13,3 +13,4 @@ references:
   - "Great Expectations (GX)"
   - "dbt (Data Testing)"
   - "Testcontainers"
+  - "Elementary (Data Observability)"
