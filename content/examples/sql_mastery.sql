@@ -112,20 +112,22 @@ SELECT
     cmd.commandeId,
     cmd.montant,
     cmd.dateCommande
-FROM clientsActifs c
+FROM commandesFiltrees cmd
 /*
    5. CONSCIENCE DU FAN-OUT (JOINTURES)
    --------------------------------------------------------------------------
    ❌ ANTI-PATTERN : Joindre sans comprendre la cardinalité.
    Un LEFT JOIN n'est pas inoffensif : s'il y a des doublons à droite, 
    il va multiplier les lignes à gauche (Fan-out) et fausser les KPIs.
+   Ex: `FROM clients LEFT JOIN commandes` va dissimuler une relation 1:N.
 
-   ✅ CRAFT PATTERN : Garantir l'unicité
-   Le Craftsman s'assure toujours que la clé de jointure de la table de droite
-   est unique (1:1 ou N:1). Si c'est 1:N, on agrège avant de joindre.
+   ✅ CRAFT PATTERN : La table de gauche dicte le grain
+   Ici, le modèle est une table de faits (Commandes). On part donc des commandes 
+   et on enrichit avec le client (Relation N:1). Aucun risque de Fan-out.
+   Si on voulait une dimension Client (1:N), il faudrait agréger les commandes.
 */
-LEFT JOIN commandesFiltrees cmd
-    ON c.clientId = cmd.clientId
+LEFT JOIN clientsActifs c
+    ON cmd.clientId = c.clientId
 
 /*
    6. UNION ALL vs UNION (PERFORMANCE)
