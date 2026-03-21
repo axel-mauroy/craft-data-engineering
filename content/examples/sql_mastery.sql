@@ -39,7 +39,20 @@ commandesFiltrees AS (
         commandeId,
         clientId,
         montant,
-        dateCommande
+        dateCommande,
+        /*
+           7. WINDOW FUNCTIONS (Éviter la sous-requête corrélée)
+           --------------------------------------------------------------------------
+           ❌ ANTI-PATTERN : Sous-requête corrélée pour trouver la dernière commande
+           Exécutée ligne par ligne - O(n²) sur les gros volumes.
+
+           ✅ CRAFT PATTERN : Window function
+           Un seul scan, le moteur calcule le rang en parallèle par partition.
+        */
+        ROW_NUMBER() OVER (
+            PARTITION BY clientId 
+            ORDER BY dateCommande DESC
+        ) AS rang_commande
     FROM {{ ref('stg_commandes') }}
     /*
        3. PRÉDICATS SARGables (Search ARGument ABLE)
