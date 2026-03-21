@@ -1,6 +1,6 @@
 /* 
    ==========================================================================
-   ARCHITECTURE PATTERN : ISOLATION DU DOMAINE (Agnosticisme Technique)
+   ARCHITECTURE PATTERN : ISOLATION DE LA LOGIQUE ANALYTIQUE
    ==========================================================================
    Ce document illustre la séparation de la logique métier (Domain) de 
    l'infrastructure (Adapter). Nous utilisons ici l'Architecture Hexagonale.
@@ -36,7 +36,7 @@ WHERE DATE(f.dateCreation) = CURRENT_DATE(); -- ⚠️ Couplage temporel d'infra
 
 /* 
    --------------------------------------------------------------------------
-   ✅ LA VISION "CRAFT" : L'isolation du Domaine (Architecture Hexagonale)
+   ✅ LA VISION "CRAFT" : L'isolation de la Logique Analytique
    --------------------------------------------------------------------------
 */
 
@@ -54,9 +54,9 @@ def calculer_remise_fidelite(statut_carte: str, montant_total: float) -> float:
 
 
 -- Étape 2 : Le Port (Macro Jinja isolée)
--- On encapsule la règle dans une Macro.
--- 💡 Note : C'est une isolation partielle (pragmatique). Les paramètres reçoivent
--- des expressions SQL (colonnes), pas des valeurs directes.
+-- On encapsule la règle analytique dans une Macro.
+-- 💡 Note : C'est une isolation partielle (pragmatique). dbt reste ici un "adapter de lecture" 
+-- qui isole la logique de transformation du reste du pipeline.
 -- Fichier: macros/domain_sales/calculer_remise.sql
 
 {% macro calculer_remise(colonne_statut, colonne_montant) %}
