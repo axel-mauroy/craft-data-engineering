@@ -8,6 +8,24 @@
    va physiquement allouer la mémoire et lire les disques.
 */
 
+{{
+    config(
+        materialized='table',
+        tags=['craft_example']
+    )
+}}
+
+/*
+   9. MATÉRIALISATION INTENTIONNELLE
+   --------------------------------------------------------------------------
+   View        -> Légère, toujours fraîche, coûteuse à chaque lecture.
+                  Idéale pour le staging.
+   Table       -> Coût fixe à l'écriture, lecture rapide.
+                  Idéale pour les marts consommés fréquemment.
+   Incremental -> Pour les volumes > 10M lignes avec une clé temporelle claire.
+                  Complexité accrue - à justifier explicitement.
+*/
+
 /*
    1. LA FORME (Lisibilité & CTEs)
    --------------------------------------------------------------------------
