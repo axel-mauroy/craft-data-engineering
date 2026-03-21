@@ -15,6 +15,7 @@ dépendre d'abstractions (Ports).
 # from google.cloud import bigquery
 # def charger_factures(date: str) -> list[dict]:
 #     client = bigquery.Client()
+#     # ❌ ANTI-PATTERN : Injection SQL et plan d'exécution non mis en cache
 #     query = f"SELECT * FROM `prd.sales.fctFactures` WHERE date = '{date}'"
 #     return list(client.query(query))
 
@@ -47,8 +48,22 @@ class BigQueryFactureRepository(FactureRepository):
         pass
 
     def get_factures_by_date(self, date: str) -> list[Facture]:
-        # Simulation d'un appel BigQuery sur le Read Model dbt
-        print(f"📡 Appel BigQuery sur fctFacturesEnrichies pour le {date}")
+        # ✅ CRAFT PATTERN : Utilisation des paramètres typés (Query Parameters)
+        # Cela évite l'injection SQL et permet au moteur d'optimiser le cache.
+        query = """
+            SELECT factureId, montantTtc 
+            FROM `prd-sales.prd_sales_domain.fctFacturesEnrichies`
+            WHERE dateCommande = @date_commande
+        """
+        # Simulation du job_config BigQuery
+        print(f"📡 Appel BigQuery (Paramétré) pour le @date_commande='{date}'")
+        
+        # En production, on ferait :
+        # job_config = bigquery.QueryJobConfig(
+        #     query_parameters=[bigquery.ScalarQueryParameter("date_commande", "DATE", date)]
+        # )
+        # return [Facture(...) for row in self._client.query(query, job_config=job_config)]
+        
         return [Facture(facture_id="FAC-001", montant_ttc=120.0)]
 
 
