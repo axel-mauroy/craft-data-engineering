@@ -34,7 +34,7 @@ models:
         description: "Identifiant unique de la facture."
         constraints:
           - type: not_null   # Le contrat interdit l'insertion de NULL
-          - type: primary_key # Non-enforced sur BigQuery car il n'enforce pas les PKs au niveau moteur (ce sera donc garanti via test unique)
+          - type: primary_key # Non-enforced sur BigQuery car il n'enforce pas les PKs au niveau moteur (ce sera donc garanti via test unique), mais son Query Optimizer l'utilise pour accélérer les jointures !
         meta:
           collibra_concept_id: "C-98765" # Lien direct vers la définition métier
 

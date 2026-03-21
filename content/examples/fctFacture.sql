@@ -60,4 +60,14 @@ facturesEnrichies AS (
         ON f.factureId = l.factureId
 )
 
-SELECT * FROM facturesEnrichies
+SELECT 
+    factureId,
+    clientId,
+    magasinId,
+    dateCreation,
+    statutFacture,
+    montantHt,
+    quantiteTotaleArticles,
+    montantTvaTotal,
+    montantTtc
+FROM facturesEnrichies
