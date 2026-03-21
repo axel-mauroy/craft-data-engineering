@@ -49,8 +49,8 @@ models:
         description: "Montant total Toutes Taxes Comprises de la facture."
         constraints:
           - type: not_null
-          - type: check
-            expression: "> 0" # Règle métier : une facture a toujours un montant positif
+          # ⚠️ Les contraintes sémantiques (ex: CHECK > 0) ne sont pas supportées
+          # par le DDL BigQuery. Elles sont donc déléguées aux tests dbt (data_tests).
 ```
 
 ---
@@ -94,11 +94,12 @@ SELECT
     SAFE_CAST(client_id AS STRING) AS clientId,
     
     /*
-       ✅ CRAFT PATTERN : Règle métier isolée (Hexagonal) & protégée par un CHECK
+       ✅ CRAFT PATTERN : Règle métier isolée (Hexagonal)
        La logique métier (ex: TVA) est encapsulée dans une macro dbt pure, hors
-       de l'assemblage SQL. De plus, notre contrat YAML (CHECK > 0) agit comme
-       un filet de sécurité final : si la macro calcule un négatif à cause d'une
-       source corrompue, BigQuery rejettera l'insertion grâce au contrat généré.
+       de l'assemblage SQL.
+       Puisque BigQuery ne supporte pas les contraintes CHECK dans son DDL,
+       la garantie sémantique (montantTtc > 0) sera assurée par un test dbt 
+       (ex: dbt-expectations) exécuté juste après le build.
     */
     {{ calculer_montant_ttc('montant_ht') }} AS montantTtc
 
