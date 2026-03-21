@@ -23,7 +23,16 @@ clientsActifs AS (
         clientId,
         -- ...
     FROM {{ ref('stg_clients') }}
-    WHERE statut = 'ACTIF'
+    /*
+       8. NULL AWARENESS
+       --------------------------------------------------------------------------
+       ❌ ANTI-PATTERN : WHERE statut != 'ANNULE'
+       Exclut les ANNULE mais exclut silencieusement les NULL - comportement
+       contre-intuitif garanti en production.
+
+       ✅ CRAFT PATTERN : Expliciter le traitement du NULL
+    */
+    WHERE (statut != 'ANNULE' OR statut IS NULL)
 ),
 
 /*
