@@ -3,7 +3,7 @@ title: "Stratégie de Test & Qualité"
 subtitle: "La donnée est du code : testez-la"
 content:
   - "**La Pyramide de Test Data :** Hiérarchisez vos efforts : Tests Unitaires (dbt v1.8+), Tests d'Intégration & de Contrat, et Observabilité Statistique via **Elementary**. Voir [Testing Mastery (test_mastery.md)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/test_mastery.md)."
-  - "**Test-Driven Data (TDD) :** Définissez vos attentes (nullité, unicité, distribution) avant d'écrire la transformation via des outils comme **dbt tests**, **Great Expectations** ou **Soda**. C'est votre contrat de santé."
+  - "**Test-Driven Data (TDD) :** Définissez vos attentes (nullité, unicité, distribution) avant d'écrire la transformation. Le cycle Red-Green-Refactor force à penser aux cas limites (NULL, doublons), puis à optimiser l'infrastructure sans casser la logique. Voir [TDD Mastery (tdd_mastery.md)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/tdd_mastery.md)."
   - "**Fail-Fast Checkpoints :** Intégrez des validations bloquantes dans votre orchestrateur. Si la donnée ne respecte pas le contrat, le pipeline s'arrête immédiatement pour protéger les systèmes en aval."
   - "**Environnements Éphémères (Testcontainers) :** Validez vos connecteurs (ex: SQLAlchemy vers PostgreSQL) en isolant l'infrastructure. Utilisez des containers jetables pour garantir des tests reproductibles et sans effets de bord."
   - "**Data Docs & Observabilité :** Générez une documentation visuelle (Data Docs) de la santé de vos données. La qualité ne doit plus être une boîte noire, mais un actif partagé et transparent."
