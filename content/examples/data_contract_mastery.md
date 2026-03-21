@@ -70,7 +70,11 @@ Le fichier SQL doit s'aligner parfaitement sur le YAML.
 }}
 
 WITH sourceFactures AS (
-    SELECT * FROM {{ ref('stg_factures') }}
+    SELECT
+        facture_id,
+        client_id,
+        montant_ht
+    FROM {{ ref('stg_factures') }}
 )
 
 SELECT
