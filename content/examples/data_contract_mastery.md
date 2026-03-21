@@ -30,11 +30,11 @@ models:
 
     columns:
       - name: factureId
-        data_type: string    # Contrat technique (BigQuery)
+        data_type: string    # Contrat technique
         description: "Identifiant unique de la facture."
         constraints:
           - type: not_null   # Le contrat interdit l'insertion de NULL
-          - type: primary_key
+          - type: primary_key # Non-enforced sur BigQuery car il n'enforce pas les PKs au niveau moteur (ce sera donc garanti via test unique)
         meta:
           collibra_concept_id: "C-98765" # Lien direct vers la définition métier
 
@@ -81,7 +81,7 @@ SELECT
        Si la source change de type (ex: INT64 vers STRING), BigQuery pourrait 
        laisser passer, mais le contrat dbt plantera car il attend un STRING.
 
-       ✅ CRAFT PATTERN : Cast explicite (SAFE_CAST)
+       ✅ CRAFT PATTERN : Cast explicite (ou SAFE_CAST quand le moteur le permet)
        Le Craftsman s'assure que la sortie correspond exactement au contrat
        déclaré, et gère les erreurs de typage silencieusement ou via Elementary.
     */
@@ -90,19 +90,20 @@ SELECT
     SAFE_CAST(client_id AS STRING) AS clientId,
     
     /*
-       ✅ CRAFT PATTERN : Règle métier protégée par un CHECK
-       Notre contrat YAML stipule que montantTtc doit être > 0.
-       Si l'on calcule un montant négatif à cause d'un bug source, 
-       BigQuery rejettera la ligne grâce à la contrainte générée par dbt.
+       ✅ CRAFT PATTERN : Règle métier isolée (Hexagonal) & protégée par un CHECK
+       La logique métier (ex: TVA) est encapsulée dans une macro dbt pure, hors
+       de l'assemblage SQL. De plus, notre contrat YAML (CHECK > 0) agit comme
+       un filet de sécurité final : si la macro calcule un négatif à cause d'une
+       source corrompue, BigQuery rejettera l'insertion grâce au contrat généré.
     */
-    SAFE_CAST(montant_ht * 1.20 AS NUMERIC) AS montantTtc
+    {{ calculer_montant_ttc('montant_ht') }} AS montantTtc
 
 FROM sourceFactures
 ```
 
 ---
 
-## 4. LA GESTION DES VERSIONS (Évolution sans casse)
+## 3. LA GESTION DES VERSIONS (Évolution sans casse)
 
 Que faire si le métier demande de changer le grain du modèle ou de supprimer une colonne vitale ?
 
@@ -114,8 +115,8 @@ On crée la v2 de notre contrat. La v1 continue de tourner en production pendant
 
 ---
 
-## Pourquoi c'est l'arme ultime de l'Architecte Data ?
+## Takeaways
 
 1. **Shift-Left de la Qualité** : Sans contrat, on découvre qu'une colonne a changé de type quand le tableau de bord plante en production le lundi matin (Observabilité a posteriori). Avec le `contract: enforced: true`, le développeur est bloqué sur sa machine au moment où il tape `dbt run`. Il ne peut même pas pousser son code.
 2. **Gouvernance as Code (Collibra)** : Finis les dictionnaires de données Excel obsolètes. Les tags `meta:` dans le YAML permettent à l'intégration logicielle (ou à un pipeline CI/CD personnalisé) de pousser les descriptions dbt directement dans Collibra. La documentation technique est la documentation officielle.
-3. **Optimisation BigQuery** : En déclarant les `constraints` (comme `primary_key` ou `not_null`), BigQuery (sous le capot) peut utiliser ces méta-informations pour optimiser certains plans d'exécution depuis les récentes mises à jour du moteur !
+3. **Versioning Stratégique** : Le versioning des modèles est crucial pour maintenir la compatibilité avec les consommateurs tout en faisant évoluer les données. Collibra peut afficher la v1 comme "Deprecated" pendant que la v2 est déployée, permettant une transition en douceur.
