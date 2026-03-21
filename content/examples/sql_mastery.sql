@@ -11,19 +11,28 @@
 {{
     config(
         materialized='table',
+        partition_by={
+            "field": "dateCommande",
+            "data_type": "date",
+            "granularity": "day"
+        },
+        cluster_by=['clientId'],
         tags=['craft_example']
     )
 }}
 
 /*
-   9. MATÉRIALISATION INTENTIONNELLE
+   9. LE CONTRAT PHYSIQUE (Matérialisation & Stockage)
    --------------------------------------------------------------------------
-   View        -> Légère, toujours fraîche, coûteuse à chaque lecture.
-                  Idéale pour le staging.
-   Table       -> Coût fixe à l'écriture, lecture rapide.
-                  Idéale pour les marts consommés fréquemment.
-   Incremental -> Pour les volumes > 10M lignes avec une clé temporelle claire.
-                  Complexité accrue - à justifier explicitement.
+   Un modèle dbt n'est jamais terminé sans définir son empreinte physique.
+   Le Craftsmanship impose de gérer l'I/O et le coût de requêtage.
+   
+   View        -> Légère, toujours fraîche. Idéale pour le staging.
+   Table       -> Coût fixe à l'écriture, lecture très rapide.
+   Partition   -> Divise la donnée par bloc temporel (ex: par jour).
+                  Filtre drastiquement le volume scanné.
+   Clustering  -> Trie la donnée à l'intérieur de chaque partition.
+                  Accélère les jointures et les agrégations (ex: clientId).
 */
 
 /*
