@@ -86,3 +86,39 @@ SELECT
     dateCommande,
     montantTotal
 FROM commandesDedoublonnees
+
+/*
+   ==========================================================================
+   CRAFT PATTERN (VANGUARD) : LE MICROBATCH (dbt 1.9+)
+   ==========================================================================
+   Depuis dbt core 1.9, la matérialisation 'microbatch' rend obsolète la 
+   gestion manuelle du bloc 'is_incremental()' pour les flux chronologiques.
+   C'est l'évolution ultime du Data Craftsmanship vers la simplicité extrême.
+   --------------------------------------------------------------------------
+
+{{
+    config(
+        materialized='microbatch',
+        -- Le moteur dbt découpe automatiquement les runs en lots journaliers
+        batch_size='day',
+        -- Le système filtre nativement la source et cible la bonne partition,
+        -- sans aucune clause temporelle dans notre SQL.
+        event_time='dateCommande',
+        begin=DATE '2024-01-01',
+        cluster_by=['magasinId'],
+        tags=['craft_example']
+    )
+}}
+
+SELECT
+    commandeId,
+    magasinId,
+    dateCommande,
+    montantTotal
+FROM {{ ref('stg_commandes') }}
+-- 💡 QUALIFY ROW_NUMBER() reste pertinent ici pour gérer les doublons intra-batch !
+
+-- ✅ RÉSULTAT CRAFT : Idempotence Native & Pureté du Code
+-- Le code redevient aussi simple qu'une vue logique, la complexité physique 
+-- est entièrement déléguée au moteur dbt qui gère les REPLACE par partition.
+*/
