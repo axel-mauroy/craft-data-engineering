@@ -1,9 +1,13 @@
 /* 
    ==========================================================================
-   ARCHITECTURE PATTERN : ISOLATION DE LA LOGIQUE ANALYTIQUE
+   ARCHITECTURE PATTERN : ISOLATION DE LA LOGIQUE ANALYTIQUE (READ DOMAIN)
    ==========================================================================
-   Ce document illustre la séparation de la logique métier (Domain) de 
-   l'infrastructure (Adapter). Nous utilisons ici l'Architecture Hexagonale.
+   Ce document illustre l'isolation d'une règle de reporting / KPI analytique
+   (ex: reconstitution d'une remise pour analyse BI).
+   
+   ⚠️ IMPORTANT : Les décisions métier transactionnelles (ex: le prix RÉEL 
+   facturé au client) doivent vivre dans le service applicatif amont. 
+   dbt n'est ici qu'un "Adapter de lecture" isolant la logique de calcul analytique.
 */
 
 -- Correspondance avec l'Architecture Hexagonale :
@@ -36,7 +40,7 @@ WHERE DATE(f.dateCreation) = CURRENT_DATE(); -- ⚠️ Couplage temporel d'infra
 
 /* 
    --------------------------------------------------------------------------
-   ✅ LA VISION "CRAFT" : L'isolation de la Logique Analytique
+   ✅ LA VISION "CRAFT" : Isolation de la Logique Analytique (Reporting)
    --------------------------------------------------------------------------
 */
 
