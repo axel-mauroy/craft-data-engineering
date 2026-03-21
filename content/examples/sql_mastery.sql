@@ -45,10 +45,10 @@
 
 WITH
 clientsActifs AS (
-    -- Responsabilité : Identifier les clients actifs sur l'année en cours
+    -- Responsabilité : Identifier les clients actifs et ramener leurs axes d'analyse
     SELECT 
         clientId,
-        -- ...
+        segmentFidelite -- ✅ CRAFT : On ramène un vrai attribut métier pour justifier la jointure
     FROM {{ ref('stg_clients') }}
     /*
        8. NULL AWARENESS
@@ -75,7 +75,18 @@ commandesFiltrees AS (
         commandeId,
         clientId,
         montant,
-        dateCommande
+        dateCommande,
+        /*
+           7. WINDOW FUNCTIONS & QUALIFY (L'élégance BigQuery / Snowflake)
+           --------------------------------------------------------------------------
+           ✅ CRAFT PATTERN : Window function
+           Calcul du rang de la commande. Utile en aval pour filtrer la première
+           ou la dernière commande d'un client sans repasser par des sous-requêtes.
+        */
+        ROW_NUMBER() OVER (
+            PARTITION BY clientId 
+            ORDER BY dateCommande DESC
+        ) AS rangCommande -- ✅ Typage camelCase respecté
     FROM {{ ref('stg_commandes') }}
     /*
        3. PRÉDICATS SARGables (Search ARGument ABLE) & TYPAGE
@@ -90,20 +101,10 @@ commandesFiltrees AS (
     WHERE dateCommande >= DATE '2024-01-01'
       AND dateCommande < DATE '2025-01-01'
     /*
-       7. WINDOW FUNCTIONS & QUALIFY (L'élégance BigQuery / Snowflake)
-       --------------------------------------------------------------------------
-       ❌ ANTI-PATTERN : Sous-requête corrélée ou double CTE pour filtrer le rang.
-       Exécutée ligne par ligne - O(n²) sur les gros volumes.
-
-       ✅ CRAFT PATTERN : Window function + QUALIFY
-       Un seul scan. Le moteur calcule le rang et filtre le résultat dans 
-       la même passe d'exécution, rendant le code ultra-concis.
+       💡 Note Expert BigQuery : Si ce modèle devait STRICTEMENT n'exposer 
+       que la dernière commande par client, c'est ici qu'on ajouterait :
+       -- QUALIFY rangCommande = 1
     */
-    -- Filtre magique post-Window Function : on ne garde que la dernière commande !
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY clientId 
-        ORDER BY dateCommande DESC
-    ) = 1
 )
 
 -- Assemblage Final (Le "Paragraph" principal)
@@ -119,10 +120,12 @@ SELECT
        On nomme explicitement chaque colonne sélectionnée, et on préfixe
        toujours avec l'alias de la table pour éviter toute ambiguïté.
     */
-    c.clientId,
     cmd.commandeId,
+    cmd.dateCommande,
     cmd.montant,
-    cmd.dateCommande
+    cmd.rangCommande,   -- ✅ Justifie le coût du ROW_NUMBER()
+    c.clientId,
+    c.segmentFidelite   -- ✅ Justifie le LEFT JOIN
 FROM commandesFiltrees cmd
 /*
    5. CONSCIENCE DU FAN-OUT (JOINTURES)
@@ -132,9 +135,8 @@ FROM commandesFiltrees cmd
    il va multiplier les lignes à gauche (Fan-out) et fausser les KPIs.
    Ex: `FROM clients LEFT JOIN commandes` va dissimuler une relation 1:N.
 
-   ✅ CRAFT PATTERN : La table de gauche dicte le grain
-   Ici, le modèle est une table de faits (Commandes). On part donc des commandes 
-   et on enrichit avec le client (Relation N:1). Aucun risque de Fan-out.
+   ✅ CRAFT PATTERN : La table de gauche dicte le grain (Commandes)
+   Enrichissement avec la dimension (Relation N:1). Aucun risque de Fan-out.
    Si on voulait une dimension Client (1:N), il faudrait agréger les commandes.
 */
 LEFT JOIN clientsActifs c
