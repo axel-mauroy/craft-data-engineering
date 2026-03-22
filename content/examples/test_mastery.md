@@ -1,19 +1,16 @@
-/*
-   ==========================================================================
-   CRAFT PATTERN : LA PYRAMIDE DE TESTS DATA (dbt >= 1.10 x Elementary)
-   ==========================================================================
-   Tester la donnée coûte cher en temps de calcul (I/O BigQuery) et en temps 
-   humain (faux positifs). Le Craftsman maîtrise la Pyramide de Tests pour 
-   valider sa logique métier en millisecondes, et ses données en continu.
-*/
+# CRAFT PATTERN : LA PYRAMIDE DE TESTS DATA (dbt >= 1.10 x Elementary)
 
-# ------------------------------------------------------------------------------
-# NIVEAU 1 : LE TEST UNITAIRE (La Base de la Pyramide)
-# Objectif : Tester la logique SQL pure, SANS lire les tables BigQuery (Zéro I/O).
-# Outil : dbt Unit Tests (Natifs depuis la v1.8+)
-# Fichier : models/sales/marts/sales_unit_tests.yml
-# ------------------------------------------------------------------------------
+> Tester la donnée coûte cher en temps de calcul (I/O BigQuery) et en temps humain (faux positifs). Le Craftsman maîtrise la Pyramide de Tests pour valider sa logique métier en millisecondes, et ses données en continu.
 
+---
+
+## NIVEAU 1 : LE TEST UNITAIRE (La Base de la Pyramide)
+
+**Objectif** : Tester la logique SQL pure, SANS lire les tables BigQuery (Zéro I/O).  
+**Outil** : dbt Unit Tests (Natifs depuis la v1.8+)  
+**Fichier** : `models/sales/marts/sales_unit_tests.yml`
+
+```yaml
 unit_tests:
   - name: test_logique_calcul_remise_fidelite
     description: "Vérifie que la macro de remise applique bien -10% pour les PREMIUM"
@@ -34,15 +31,17 @@ unit_tests:
       rows:
         - {factureId: "F1", montantApresRemise: 900} # 1000 - 10%
         - {factureId: "F2", montantApresRemise: 500} # Pas de remise sous 1000
+```
 
+---
 
-# ------------------------------------------------------------------------------
-# NIVEAU 2 : LE CONTRAT ET LE TEST D'INTÉGRATION (Le Milieu de la Pyramide)
-# Objectif : Garantir l'interface (Contrat) et valider la logique relationnelle (Intégration).
-# Outil : dbt Model Contracts & dbt-expectations
-# Fichier : models/sales/marts/sales_contracts.yml
-# ------------------------------------------------------------------------------
+## NIVEAU 2 : LE CONTRAT ET LE TEST D'INTÉGRATION (Le Milieu de la Pyramide)
 
+**Objectif** : Garantir l'interface (Contrat) et valider la logique relationnelle (Intégration).  
+**Outil** : dbt Model Contracts & dbt-expectations  
+**Fichier** : `models/sales/marts/sales_contracts.yml`
+
+```yaml
 models:
   - name: fctFacturesEnrichies
     config:
@@ -88,15 +87,17 @@ models:
           # S'assure que notre logique n'a pas généré de montants négatifs aberrants.
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
+```
 
+---
 
-# ------------------------------------------------------------------------------
-# NIVEAU 3 : LE TEST MÉTIER SUR MESURE (L'Expertise du Domaine)
-# Objectif : Définir une règle de gestion complexe réutilisable.
-# Outil : Macro dbt "Generic Test"
-# Fichier : macros/tests/test_montant_coherence.sql
-# ------------------------------------------------------------------------------
+## NIVEAU 3 : LE TEST MÉTIER SUR MESURE (L'Expertise du Domaine)
 
+**Objectif** : Définir une règle de gestion complexe réutilisable.  
+**Outil** : Macro dbt "Generic Test"  
+**Fichier** : `macros/tests/test_montant_coherence.sql`
+
+```sql
 /*
     -- ❌ L'ANTI-PATTERN : Écrire un test manuel jetable ou faire confiance à la source.
     -- ✅ CRAFT PATTERN : Créer un test générique réutilisable sur tous les modèles.
@@ -117,27 +118,30 @@ models:
     WHERE ROUND(montantTtc, 2) != ROUND(montantHt + montantTva, 2)
 
 {% endtest %}
+```
 
-# Application du test dans le YAML :
-#      - name: montantHt
-#        tests:
-#          - test_montant_coherence:
-#              column_tva: montantTva
-#              column_ttc: montantTtc
-#              config:
-#                store_failures: true # 🚀 CRAFT PATTERN : Sauvegarde les anomalies dans une table d'audit pour investigation métier.
+**Application du test dans le YAML :**
+```yaml
+      - name: montantHt
+        tests:
+          - test_montant_coherence:
+              column_tva: montantTva
+              column_ttc: montantTtc
+              config:
+                store_failures: true # 🚀 CRAFT PATTERN : Sauvegarde les anomalies dans une table d'audit pour investigation métier.
+```
 
+---
 
-# ------------------------------------------------------------------------------
-# NIVEAU 4 : L'OBSERVABILITÉ STATISTIQUE (Le Sommet de la Pyramide)
-# Objectif : Détecter les dérives progressives (Data Drifts) qui passent les tests stricts.
-# Outil : Elementary Data (Monitoring ML)
-# Fichier : models/sales/marts/sales_contracts.yml
-# ------------------------------------------------------------------------------
-# 💡 PRO-TIP CRAFT : Contrairement aux Niveaux 2 et 3, l'observabilité statistique n'a 
-# pas vocation à bloquer le pipeline (pas de Fail-Fast). Un Data Drift probabiliste 
-# nécessite une investigation humaine et est rapporté asynchronement sans bloquer le build complet.
+## NIVEAU 4 : L'OBSERVABILITÉ STATISTIQUE (Le Sommet de la Pyramide)
 
+**Objectif** : Détecter les dérives progressives (Data Drifts) qui passent les tests stricts.  
+**Outil** : Elementary Data (Monitoring ML)  
+**Fichier** : `models/sales/marts/sales_contracts.yml`
+
+> *(💡 **PRO-TIP CRAFT** : Contrairement aux Niveaux 2 et 3, l'observabilité statistique n'a pas vocation à bloquer le pipeline (pas de Fail-Fast). Un Data Drift probabiliste nécessite une investigation humaine et est rapporté asynchronement sans bloquer le build complet).*
+
+```yaml
 models:
   - name: fctFacturesEnrichies
     tests:
@@ -158,3 +162,4 @@ models:
               column_anomalies:
                 - mean
                 - stddev
+```
