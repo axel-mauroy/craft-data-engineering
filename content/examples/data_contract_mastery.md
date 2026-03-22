@@ -65,7 +65,9 @@ Le fichier SQL doit s'aligner parfaitement sur le YAML.
     config(
         materialized='incremental',
         unique_key='factureId',
-        -- Le contrat est défini dans le YAML, mais appliqué ici par dbt
+        on_schema_change='fail' -- 🚀 REQUIS POUR LES CONTRATS INCRÉMENTAUX
+        -- Le contrat est défini dans le YAML, dbt effectue un "preflight check" 
+        -- avant le build pour s'assurer que ce SELECT le respecte strictement.
     )
 }}
 
@@ -83,11 +85,14 @@ SELECT
        ----------------------------------------------------------------------
        ❌ ANTI-PATTERN : SELECT id_facture AS factureId
        Si la source change de type (ex: INT64 vers STRING), BigQuery pourrait 
-       laisser passer, mais le contrat dbt plantera car il attend un STRING.
+       laisser passer. Cependant, dbt effectue un "preflight check" avant la 
+       matérialisation : si le type retourné diffère du contrat YAML, la 
+       compilation échouera net (Fail Fast).
 
        ✅ CRAFT PATTERN : Cast explicite (ou SAFE_CAST quand le moteur le permet)
-       Le Craftsman s'assure que la sortie correspond exactement au contrat
-       déclaré, et gère les erreurs de typage silencieusement ou via Elementary.
+       Le SAFE_CAST garantit la maîtrise de la donnée de bout en bout. 
+       La sortie correspond exactement au contrat déclaré, évitant l'échec 
+       du preflight check et gérant silencieusement les erreurs de typage.
     */
     SAFE_CAST(facture_id AS STRING) AS factureId,
     
