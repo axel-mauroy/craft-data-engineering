@@ -124,6 +124,8 @@ models:
 #          - test_montant_coherence:
 #              column_tva: montantTva
 #              column_ttc: montantTtc
+#              config:
+#                store_failures: true # 🚀 CRAFT PATTERN : Sauvegarde les anomalies dans une table d'audit pour investigation métier.
 
 
 # ------------------------------------------------------------------------------
@@ -132,6 +134,9 @@ models:
 # Outil : Elementary Data (Monitoring ML)
 # Fichier : models/sales/marts/sales_contracts.yml
 # ------------------------------------------------------------------------------
+# 💡 PRO-TIP CRAFT : Contrairement aux Niveaux 2 et 3, l'observabilité statistique n'a 
+# pas vocation à bloquer le pipeline (pas de Fail-Fast). Un Data Drift probabiliste 
+# nécessite une investigation humaine et est rapporté asynchronement sans bloquer le build complet.
 
 models:
   - name: fctFacturesEnrichies
