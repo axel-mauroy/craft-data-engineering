@@ -6,6 +6,8 @@ Avez-vous déjà dû déboguer un rapport financier où le montant TTC d'une fac
 
 Ce bug classique n'est pas une erreur de calcul, c'est une **erreur d'architecture**. Il survient quand la logique métier est fragmentée entre trop de domaines. Appliquer le concept d'**Aggregate** permet de supprimer ces incohérences à la racine.
 
+Dans notre [guide TDD](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/tdd_mastery.md), nous avons vu comment protéger un invariant ligne par ligne. Cet article répond à une question différente : **où doit vivre cet invariant dans votre architecture ?**
+
 ---
 
 ## 1. Qu'est-ce qu'un Aggregate et un Invariant ?
