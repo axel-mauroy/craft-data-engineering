@@ -121,7 +121,38 @@ Que faire si le métier demande de changer le grain du modèle ou de supprimer u
 Cela va casser les requêtes des autres domaines (Data Mesh Fail).
 
 ✅ **CRAFT PATTERN** : Le Model Versioning (dbt >= 1.5)  
-On crée la v2 de notre contrat. La v1 continue de tourner en production pendant une "fenêtre de dépréciation" pour laisser le temps aux consommateurs de migrer. Collibra affichera la v1 comme "Deprecated".
+
+### 3.1. Le pilotage des versions (Configuration YAML)
+*Fichier : `models/sales/marts/sales_contracts.yml`*
+
+```yaml
+models:
+  - name: fctFacturesEnrichies
+    latest_version: 2 # Indique la version par défaut
+    
+    # ✅ CRAFT PATTERN : Configuration des versions
+    versions:
+      - v: 2 # La nouvelle version avec le "breaking change"
+      
+      - v: 1 # L'ancienne version maintenue en vie
+        # La date butoir formelle pour les consommateurs
+        deprecation_date: "2026-06-01" 
+```
+
+Si le modèle possède un contrat strict (`enforced: true`), dbt **empêchera techniquement la suppression du modèle v1** tant que la `deprecation_date` n'est pas passée. Les requêtes sur la v1 lèvent des warnings explicites dans les logs. C'est l'ultime garantie de sécurité downstream.
+
+### 3.2. L'organisation physique des fichiers
+Chaque version possède son propre fichier SQL physique d'implémentation :
+- `models/sales/marts/fctFacturesEnrichies_v1.sql` (l'ancienne logique)
+- `models/sales/marts/fctFacturesEnrichies_v2.sql` (la nouvelle logique)
+
+Le fichier YAML sert de hub central pour partager les descriptions et le noyau du contrat, en ne déclarant que les exceptions propres à chaque version.
+
+### 3.3. L'impact côté Consommateur (Le *ref* explicite)
+- **Comportement par défaut** : Si le domaine comptabilité écrit `{{ ref('fctFacturesEnrichies') }}`, dbt le dirige automatiquement vers la `latest_version`.
+- **Protection Craft (Version Pinning)** : S'ils ne sont pas prêts, ils peuvent figer leur code via `{{ ref('fctFacturesEnrichies', v=1) }}`. Leur pipeline est immunisé jusqu'à la date de dépréciation.
+
+*(💡 **Pro-Tip** : Pour les consommateurs hors-dbt branchés en direct sur la base (ex: Tableau), créez une vue canonique `fctFacturesEnrichies` (sans suffixe de version) qui pointe systématiquement vers la `latest_version` pour absorber la bascule en douceur).*
 
 ---
 
