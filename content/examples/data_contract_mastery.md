@@ -15,12 +15,12 @@ models:
   - name: fctFacturesEnrichies
     description: "Modèle central des factures, exposé aux autres domaines (Comptabilité)."
     
-    # ✅ CRAFT PATTERN : Activation du contrat
-    # Si le SQL génère une table qui ne respecte pas EXACTEMENT ces types,
-    # dbt refusera de compiler (Erreur bloquante en CI/CD).
+    # ✅ CRAFT PATTERN : Le "Data Product" complet (Contrat + Interface Publique)
     config:
+      materialized: table    # Requis pour forcer l'application du "not_null" au niveau du DDL
+      access: public         # 🚀 Rend le modèle consommable par les autres projets (Data Mesh)
       contract:
-        enforced: true
+        enforced: true       # Si le SQL dévie de cette structure, dbt refuse de compiler
       
       # Pont avec Collibra : Les métadonnées remontent via le manifest.json
       meta:
@@ -34,18 +34,18 @@ models:
         description: "Identifiant unique de la facture."
         constraints:
           - type: not_null   # Le contrat interdit l'insertion de NULL
-          - type: primary_key # Non-enforced sur BigQuery car il n'enforce pas les PKs au niveau moteur (ce sera donc garanti via test unique), mais son Query Optimizer l'utilise pour accélérer les jointures !
+          - type: primary_key # Non-enforced sur BigQuery car il n'enforce pas les PKs au niveau moteur, mais le Query Optimizer l'utilise !
         meta:
-          collibra_concept_id: "C-98765" # Lien direct vers la définition métier
+          collibra_concept_id: "C-98765"
 
       - name: clientId
         data_type: string
         description: "Identifiant du client."
         meta:
-          pii: true          # Collibra saura qu'il faut masquer ce champ
+          pii: true          
           
       - name: montantTtc
-        data_type: numeric
+        data_type: numeric(16, 2) # 🚀 Précision requise depuis dbt 1.7 pour éviter les warnings et la perte de décimales
         description: "Montant total Toutes Taxes Comprises de la facture."
         constraints:
           - type: not_null
