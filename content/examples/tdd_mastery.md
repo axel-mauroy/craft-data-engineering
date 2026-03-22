@@ -74,7 +74,7 @@ SELECT
 FROM {{ ref('stg_lignes_facture') }}
 ```
 
-Nous lançons ensuite la commande isolant les tests unitaires : `dbt test --select fctLignesMarge,test_type:unit`
+Nous lançons ensuite la commande isolant les tests unitaires : `dbt test --select fctLignesMarge test_type:unit`
 Le test va échouer proprement en affichant la différence entre nos attentes (50) et le résultat actuel (0). C'est le but : la cible est verrouillée, la phase GREEN peut commencer.
 
 ---
@@ -89,30 +89,29 @@ Maintenant, nous écrivons le code SQL **strict minimum** pour satisfaire le tes
 {{ config(materialized='table') }}
 
 WITH lignes AS (
-    -- Phase GREEN : SELECT * volontaire. Le REFACTOR corrigera le contrat de colonnes.
     SELECT * FROM {{ ref('stg_lignes_facture') }}
 )
 
 SELECT
     ligneId,
+    dateTransaction,
+    magasinId,
     /*
        ✅ CRAFT PATTERN : La logique est dictée par les tests (TDD)
        Grâce à notre test sur les lignes L2 et L3, nous avons été FORCÉS 
        d'utiliser des COALESCE et des CASE WHEN pour gérer les valeurs NULL.
-       Sans le TDD, nous aurions écrit "montantVente - coutRevient - remise" 
-       et laissé des NULL silencieux se propager en production.
     */
     SAFE_CAST(
         CASE 
             WHEN coutRevient IS NULL THEN 0
             ELSE montantVente - coutRevient - COALESCE(remise, 0)
         END 
-    AS NUMERIC(16, 2)) AS margeNette -- 🚀 Alignement avec le contrat
+    AS NUMERIC(16, 2)) AS margeNette
 
 FROM lignes
 ```
 
-Nous relançons notre test isolé en mémoire : `dbt test --select fctLignesMarge,test_type:unit`. Le test passe au **VERT**. La logique métier est validée et garantie.
+Nous relançons notre test isolé en mémoire : `dbt test --select fctLignesMarge test_type:unit`. Le test passe au **VERT**. La logique métier est validée et garantie.
 
 ---
 
@@ -129,7 +128,7 @@ Nous allons refactoriser le code pour le rendre **incrémental et optimisé**. L
     config(
         materialized='incremental',
         incremental_strategy='insert_overwrite',
-        on_schema_change='fail', -- 🚀 OBLIGATOIRE : Requis par dbt pour les modèles incrémentaux sous contrat
+        on_schema_change='fail', -- OBLIGATOIRE pour les modèles incrémentaux sous contrat
         partition_by={
             "field": "dateTransaction",
             "data_type": "date",
