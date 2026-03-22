@@ -37,10 +37,13 @@ taxes AS (
 ),
 final AS (
     SELECT 
-        f.*,
+        f.factureId,
+        f.clientId,
+        f.dateFacture,
+        f.montantHt,
         t.montantTva,
         -- L'invariant est finalisé ici, dans le Data Product exposé
-        f.montantHt + t.montantTva AS montantTtc
+        (f.montantHt + t.montantTva) AS montantTtc
     FROM base_factures f
     LEFT JOIN taxes t USING (factureId)
 )
@@ -74,13 +77,13 @@ models:
 ```
 
 ### 3.3. Automatiser l'Observabilité (Elementary)
-L'observabilité moderne repose sur des tests d'intégrité de niveau ligne. Un test de cohérence `column_a + column_b = column_c` devient impossible à automatiser si ces colonnes vivent dans deux domaines différents. En refermant l'Aggregate, vous permettez une détection immédiate de toute anomalie de calcul via vos tests dbt.
+Des outils comme **Elementary** permettent de détecter automatiquement les anomalies de volume (`volume_anomalies`), de distribution (`dimension_anomalies`) ou de fraîcheur sur vos modèles. Mais un test de cohérence ligne à ligne (`column_a + column_b = column_c`) devient impossible si ces colonnes vivent dans deux domaines différents. En refermant l'Aggregate, vous rendez chaque anomalie de calcul détectable instantanément, sans jointure inter-domaines coûteuse.
 
 ---
 
 ## 🔗 Le pont avec le TDD
 
-L'Aggregate et le TDD sont les deux faces de la même médaille. Le test unitaire `test_calcul_marge_nette_edge_cases` défini dans notre [guide TDD (tdd_mastery.md)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/tdd_mastery.md) est précisément le **garde-fou** qui protège l'invariant de cet Aggregate. Sans ce test, vous n'avez aucune preuve que votre Aggregate est cohérent. Avec, vous pouvez refactoriser l'esprit libre.
+**L'Aggregate définit ce qui doit être vrai. Le TDD garantit que ça l'est.** Le test unitaire `test_calcul_marge_nette_edge_cases` défini dans notre [guide TDD (tdd_mastery.md)](https://github.com/axel-mauroy/craft-data-engineering/blob/main/content/examples/tdd_mastery.md) est précisément le garde-fou qui protège l'invariant de cet Aggregate. Sans ce test, vous n'avez aucune preuve que votre Aggregate est cohérent. Avec, vous pouvez refactoriser l'esprit libre.
 
 ---
 
