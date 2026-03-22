@@ -95,19 +95,29 @@ class DuckDBFactureRepository(FactureRepository):
         return [Facture(facture_id="F-MOCK-1", montant_ttc=150.0)]
 
 # ------------------------------------------------------------------------------
-# 3. L'ASSEMBLAGE (Injection de Dépendance)
+# 3. L'INJECTION (L'Assemblage au démarrage de l'application ou du DAG)
 # ------------------------------------------------------------------------------
 
+def main():
+    # L'infrastructure est définie par l'environnement (IaC / Variables d'environnement)
+    env = os.getenv("ENV", "DEV")
+    
+    # Choix de l'Adapter (Le seul endroit où l'on prend une décision technique)
+    if env == "PRD":
+        repository = BigQueryFactureRepository(
+            project="lm-data-prd", 
+            dataset="prd_sales_domain"
+        )
+    else:
+        # En DEV ou en Test, on utilise la base locale ultra-rapide
+        repository = DuckDBFactureRepository()
+
+    # Injection du Repository dans le Service Métier
+    service = FactureService(repository)
+
+    # Exécution de la logique métier (Le Domaine ne sait pas si c'est BigQuery ou DuckDB !)
+    chiffre_affaires = service.calculer_chiffre_affaires("2026-03-22")
+    print(f"Chiffre d'affaires : {chiffre_affaires} €")
+
 if __name__ == "__main__":
-    # Scénario 1 : Production (Configuration injectée via Variables d'Environnement / Terraform)
-    # repo_prod = BigQueryFactureRepository(
-    #     project=os.environ.get("GCP_PROJECT", "prd-sales"),
-    #     dataset=os.environ.get("BQ_DATASET", "prd_sales_domain")
-    # )
-    # service_prod = FactureService(repository=repo_prod)
-    
-    # Scénario 2 : Test Unitaire / Local (DuckDB)
-    service_test = FactureService(repository=DuckDBFactureRepository())
-    
-    ca = service_test.calculer_chiffre_affaires("2024-01-15")
-    print(f"Chiffre d'affaires calculé via DuckDB : {ca} €")
+    main()
