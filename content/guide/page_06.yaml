@@ -13,7 +13,7 @@ content:
   - "**L'Automatisme de la Qualité :** Ne laissez jamais un débat sur l'indentation polluer une revue de code. Utilisez **Ruff** (par Astral) pour le Python et **SQLFluff** pour le SQL/dbt."
   - "**Fonctions Pures, Isolation & Immutabilité :** Isolez vos calculs métiers dans des fonctions pures. En Data Engineering fonctionnel, un modèle ne mute jamais la donnée source, il crée de nouveaux états. L'immutabilité garantit l'absence absolue d'effets de bord, et rend chaque composant de votre pipeline prévisible, parallélisable et testable unitairement."
   - "**Refactoring vs Rewrite (Le Bouclier TDD) :** Le refactoring est une amélioration sécurisée de la structure (optimisation I/O) qui ne change pas le comportement. Cette garantie d'isolement comportemental repose intégralement sur vos tests unitaires et `dbt-expectations`. Sans suite de tests, le refactoring est au mieux de l'espoir, au pire une réécriture à l'aveugle."
-  - "**Le Code comme Matière Vivante :** Un pipeline n'est jamais figé. Si vous identifiez une fragilité ou une zone d'ombre, traitez-la immédiatement pour éviter l'accumulation de dette technique."
+  - "**Le Code comme Matière Vivante :** Un pipeline n'est pas figé. Si vous identifiez une fragilité ou une zone d'ombre, traitez-la pour éviter l'accumulation de dette technique."
 references:
   - "Robert C. Martin (Clean Code)"
   - "Martin Fowler (Refactoring)"
