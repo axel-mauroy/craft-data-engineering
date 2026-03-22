@@ -36,7 +36,7 @@ models:
       - name: magasinId
         data_type: string
       - name: margeNette
-        data_type: numeric
+        data_type: numeric(16, 2)
 
     # 2. Le Test Unitaire dbt (Le coeur du TDD)
     # Note : le bloc `expect` peut ignorer les colonnes non testées (dateTransaction, magasinId).
@@ -62,7 +62,19 @@ models:
             - {ligneId: "L3", margeNette: 0} # Sécurité métier exigée
 ```
 
-Pour initier la phase "RED", nous créons un fichier SQL "bouchon" (dummy) et nous lançons la commande `dbt test --select fctLignesMarge`. Le test va **échouer**. C'est le but.
+Pour initier la phase "RED", nous créons un fichier SQL "bouchon" (dummy) qui respecte la forme mais pas la logique. 
+*Fichier : `models/sales/marts/fctLignesMarge.sql`*
+
+```sql
+-- BOUCHON TDD (Phase RED) : On renvoie 0 partout pour faire échouer le test métier.
+SELECT 
+    ligneId,
+    0 AS margeNette
+FROM {{ ref('stg_lignes_facture') }}
+```
+
+Nous lançons ensuite la commande isolant les tests unitaires : `dbt test --select fctLignesMarge,test_type:unit`
+Le test va échouer proprement en affichant la différence entre nos attentes (50) et le résultat actuel (0). C'est le but : la cible est verrouillée, la phase GREEN peut commencer.
 
 ---
 
