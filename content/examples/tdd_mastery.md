@@ -1,5 +1,6 @@
-# CRAFT PATTERN : TEST-DRIVEN DATA (TDD)
-**Le cycle "Red, Green, Refactor" appliqué au SQL**
+# CRAFT PATTERN : Le cycle "Red, Green, Refactor" appliqué au SQL
+
+**Pourquoi j'écris mes tests dbt avant mon SQL**
 
 Le TDD en ingénierie de la donnée n'est pas une option, c'est un bouclier. Il force le Data Engineer à penser aux cas limites (valeurs manquantes, doublons) **avant** d'écrire la moindre ligne de transformation.
 
