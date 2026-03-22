@@ -106,12 +106,12 @@ SELECT
             WHEN coutRevient IS NULL THEN 0
             ELSE montantVente - coutRevient - COALESCE(remise, 0)
         END 
-    AS NUMERIC) AS margeNette
+    AS NUMERIC(16, 2)) AS margeNette -- 🚀 Alignement avec le contrat
 
 FROM lignes
 ```
 
-Nous relançons `dbt test`. Le test passe au **VERT**. La logique métier est validée, isolée, et garantie.
+Nous relançons notre test isolé en mémoire : `dbt test --select fctLignesMarge,test_type:unit`. Le test passe au **VERT**. La logique métier est validée et garantie.
 
 ---
 
@@ -128,6 +128,7 @@ Nous allons refactoriser le code pour le rendre **incrémental et optimisé**. L
     config(
         materialized='incremental',
         incremental_strategy='insert_overwrite',
+        on_schema_change='fail', -- 🚀 OBLIGATOIRE : Requis par dbt pour les modèles incrémentaux sous contrat
         partition_by={
             "field": "dateTransaction",
             "data_type": "date",
@@ -163,11 +164,17 @@ SELECT
             WHEN coutRevient IS NULL THEN 0
             ELSE montantVente - coutRevient - COALESCE(remise, 0)
         END 
-    AS NUMERIC) AS margeNette
+    AS NUMERIC(16, 2)) AS margeNette
 FROM lignes
 ```
 
-Nous lançons une dernière fois `dbt test`. C'est toujours **VERT**. Le code est désormais prêt pour la production : il est fonctionnellement exact **et** physiquement optimisé.
+**Le test final (Validation globale)** : Plutôt que de relancer uniquement le test unitaire, le Craftsman lance maintenant la commande suprême pour déployer son travail : `dbt build --select fctLignesMarge`. Cette commande va :
+- Lancer le test unitaire (Vérification de la logique pure).
+- Valider le contrat DDL (Vérification de la forme).
+- Matérialiser la table incrémentale de manière optimisée.
+- Lancer les Data Tests (ex: `not_null` sur la table physique).
+
+C'est **VERT** sur toute la ligne. Le code est désormais prêt pour la production : il est fonctionnellement exact, physiquement optimisé et formellement gouverné.
 
 ---
 
