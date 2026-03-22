@@ -37,34 +37,57 @@ unit_tests:
 
 
 # ------------------------------------------------------------------------------
-# NIVEAU 2 : LE TEST D'INTÉGRATION ET DE CONTRAT (Le Milieu de la Pyramide)
-# Objectif : Vérifier que la donnée physique respecte les règles relationnelles.
-# Outil : dbt Data Tests & dbt_utils
+# NIVEAU 2 : LE CONTRAT ET LE TEST D'INTÉGRATION (Le Milieu de la Pyramide)
+# Objectif : Garantir l'interface (Contrat) et valider la logique relationnelle (Intégration).
+# Outil : dbt Model Contracts & dbt-expectations
 # Fichier : models/sales/marts/sales_contracts.yml
 # ------------------------------------------------------------------------------
 
 models:
   - name: fctFacturesEnrichies
+    config:
+      # ✅ CRAFT PATTERN : Le Contrat (L'Interface)
+      # Bloque la compilation si le code SQL renvoie un mauvais type de donnée ou dévie du schéma.
+      contract:
+        enforced: true 
+
+    tests:
+      # ✅ CRAFT PATTERN : Intégrité Structurelle (Package dbt-expectations)
+      # Vérifie que la jointure avec stg_clients n'a ni perdu ni décuplé de lignes (fan-out).
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: ref('stg_factures')
+
     columns:
       - name: factureId
-        tests:
+        data_type: string    # <-- Fait partie du Contrat (Forme)
+        tests:               # <-- Fait partie des Data Tests (Contenu)
           - unique
           - not_null
       
       - name: clientId
+        data_type: string
         tests:
-          # ✅ CRAFT PATTERN : Intégrité Référentielle (Foreign Key)
+          # ✅ CRAFT PATTERN : Intégrité Référentielle (Integration Test natif)
           # Vérifie que chaque facture est rattachée à un client qui existe VRAIMENT 
-          # dans le domaine Client. Fail-fast bloquant si désynchronisation.
+          # dans le domaine Client. Fail-fast à l'exécution si désynchronisation.
           - relationships:
               to: ref('dimClient')
               field: clientId
 
       - name: statutFacture
+        data_type: string
         tests:
           # Évite les valeurs inattendues liées à un changement silencieux de l'ERP source
           - accepted_values:
               values: ['CREEE', 'PAYEE', 'ANNULEE', 'REMBOURSEE']
+
+      - name: montantApresRemise
+        data_type: numeric(16, 2)
+        tests:
+          # ✅ CRAFT PATTERN : Test d'intégration avancé (Package dbt-expectations)
+          # S'assure que notre logique n'a pas généré de montants négatifs aberrants.
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
 
 
 # ------------------------------------------------------------------------------
