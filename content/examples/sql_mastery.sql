@@ -22,7 +22,7 @@
 }}
 
 /*
-   9. LE CONTRAT PHYSIQUE (Matérialisation & Stockage)
+   1. LE CONTRAT PHYSIQUE (Matérialisation & Stockage)
    --------------------------------------------------------------------------
    Un modèle dbt n'est jamais terminé sans définir son empreinte physique.
    Le Craftsmanship impose de gérer l'I/O et le coût de requêtage.
@@ -36,7 +36,7 @@
 */
 
 /*
-   1. LA FORME (Lisibilité & CTEs)
+   2. LA FORME (Lisibilité & CTEs)
    --------------------------------------------------------------------------
    Le SQL devient vite illisible. Le Craftsman utilise les CTEs (WITH) non 
    pas comme de simples sous-requêtes, mais comme des paragraphes logiques. 
@@ -51,7 +51,7 @@ clientsActifs AS (
         segmentFidelite -- ✅ CRAFT : On ramène un vrai attribut métier pour justifier la jointure
     FROM {{ ref('stg_clients') }}
     /*
-       8. NULL AWARENESS
+       3. NULL AWARENESS
        --------------------------------------------------------------------------
        ❌ ANTI-PATTERN : WHERE statut != 'ANNULE'
        Exclut les ANNULE mais exclut silencieusement les NULL - comportement
@@ -63,7 +63,7 @@ clientsActifs AS (
 ),
 
 /*
-   2. LE FOND (Plan d'exécution & I/O)
+   4. LE FOND (Plan d'exécution & I/O)
    --------------------------------------------------------------------------
    Règle d'or : On filtre le plus tôt possible dans la première CTE pour 
    réduire la taille des données en mémoire avant le premier JOIN. 
@@ -77,7 +77,7 @@ commandesFiltrees AS (
         montant,
         dateCommande,
         /*
-           7. WINDOW FUNCTIONS & QUALIFY (L'élégance BigQuery / Snowflake)
+           5. WINDOW FUNCTIONS & QUALIFY (L'élégance BigQuery / Snowflake)
            --------------------------------------------------------------------------
            ✅ CRAFT PATTERN : Window function
            Calcul du rang de la commande. Utile en aval pour filtrer la première
@@ -89,7 +89,7 @@ commandesFiltrees AS (
         ) AS rangCommande -- ✅ Typage camelCase respecté
     FROM {{ ref('stg_commandes') }}
     /*
-       3. PRÉDICATS SARGables (Search ARGument ABLE) & TYPAGE
+       6. PRÉDICATS SARGables (Search ARGument ABLE) & TYPAGE
        ----------------------------------------------------------------------
        ❌ ANTI-PATTERN : WHERE EXTRACT(YEAR FROM dateCommande) = 2024
        Force un Full Scan. Par ailleurs, `dateCommande >= '2024-01-01'` 
@@ -110,7 +110,7 @@ commandesFiltrees AS (
 -- Assemblage Final (Le "Paragraph" principal)
 SELECT
     /*
-       4. CONTRAT DE DONNÉES & EXPLICITÉ
+       7. CONTRAT DE DONNÉES & EXPLICITÉ
        ----------------------------------------------------------------------
        ❌ ANTI-PATTERN : SELECT * ou SELECT c.clientId, cmd.*
        Ceci crée une dépendance fragile. L'ajout d'une colonne en amont peut
@@ -128,7 +128,7 @@ SELECT
     c.segmentFidelite   -- ✅ Justifie le LEFT JOIN
 FROM commandesFiltrees cmd
 /*
-   5. CONSCIENCE DU FAN-OUT (JOINTURES)
+   8. CONSCIENCE DU FAN-OUT (JOINTURES)
    --------------------------------------------------------------------------
    ❌ ANTI-PATTERN : Joindre sans comprendre la cardinalité.
    Un LEFT JOIN n'est pas inoffensif : s'il y a des doublons à droite, 
@@ -143,7 +143,7 @@ LEFT JOIN clientsActifs c
     ON cmd.clientId = c.clientId
 
 /*
-   6. UNION ALL vs UNION (PERFORMANCE)
+   9. UNION ALL vs UNION (PERFORMANCE)
    --------------------------------------------------------------------------
    ❌ ANTI-PATTERN : Utiliser UNION par défaut
    UNION force le moteur à faire un DISTINCT global caché (Tri + Dédoublonnage),
